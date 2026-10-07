@@ -83,3 +83,20 @@ Remove-Item Env:DATABASE_URL
 ```
 
 Choose another test port if `25433` is occupied or reserved. Python tests and the manual provider-backed RAG flow are described in [TESTING.md](TESTING.md). Root environment loading and explicit standalone migration commands are documented in [COMMANDS.md](COMMANDS.md).
+
+## Follow-up launch — 2026-10-08
+
+The README update changed documentation only. The full test results above remain the 2026-10-07 run. Markdown/link validation and the documentation diff check passed after the update.
+
+`bun run dev` was started as a hidden background process on Windows and left running at the user's request. It uses the existing local `.env` and preserves the development Docker volumes. The outbox scheduler runs normally. Startup logs and the launcher record are kept under the ignored `.artifacts/dev-session-*` directory.
+
+| Endpoint | Observed result |
+| --- | --- |
+| Public site, `http://localhost:4321/` | HTTP 200 |
+| Workspace, `http://localhost:5173/` | HTTP 200 |
+| Bun API, `http://localhost:3100/health` | HTTP 200 |
+| Agent, `http://localhost:8001/health/live` | HTTP 200 |
+| Agent, `http://localhost:8001/health/ready` | HTTP 503 without embedding settings |
+| Agent module API without a session | HTTP 401 |
+
+The first site request timed out during cold startup. A subsequent request after warm-up returned HTTP 200. The current configuration still has no real AI provider; account and workspace functionality starts independently of it. Email delivery uses the schema default, `disabled`.

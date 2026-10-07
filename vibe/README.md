@@ -10,6 +10,14 @@ A local-first starter for hackathon projects. Astro serves the public site, Vite
 
 This application is stored under `vibe/` in [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack). Run the commands below from `vibe/`. Git is configured in its parent workspace. The sibling `agentic-rag/` directory is reference source and is not started by these commands.
 
+## Current status and stack
+
+The full local verification passed on 2026-10-07: 543 Bun tests, 34 Python tests, 10 Chromium scenarios, 2 build-contract checks, workspace type checks, lint, builds, and the application dependency audit. Registration, sessions, profile/avatars, user/admin access, and the local API/scheduler work. The runtime was started and its HTTP endpoints checked again on 2026-10-08.
+
+The RAG module is implemented and passed 12 runtime checks for PDF/TXT, indexing, streaming, citations, conversation persistence, and owner isolation with a controlled AI provider. The current local `.env` has no real LLM or embedding settings: chat returns `LLM_NOT_CONFIGURED`, and full agent readiness returns HTTP 503 until embeddings are configured. Password-reset mail defaults to disabled. Real cloud integrations, payments, and mobile are outside this verified local launch.
+
+The active stack is TypeScript/Bun/Hono/Drizzle/PostgreSQL for the API; React 19/Vite 8/TanStack/Tailwind 4 for the workspace; Astro 7/React/Three.js for the public site; and Python 3.12/FastAPI/LangChain/LangGraph/SQLAlchemy/Chroma for the agent. Docker Compose, uv, Bun workspaces, and Turborepo manage the local environment. The [workspace README](https://github.com/Feruum/TemplateHack#technology-stack) contains the complete stack and capability-status tables; [VERIFICATION.md](docs/VERIFICATION.md) contains the check details.
+
 ## Applications
 
 | Path and guide | Purpose |

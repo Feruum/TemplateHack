@@ -1,0 +1,4 @@
+version: v1
+name: buf.build/user/agentic-rag-monorepo
+deps:
+  - buf.build/googleapis/googleapis

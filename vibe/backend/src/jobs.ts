@@ -1,0 +1,135 @@
+import type { BackendRuntime } from './runtime'
+import { sql } from 'drizzle-orm'
+import { and, eq, inArray, lt, or } from 'drizzle-orm'
+import { authSessions, passwordResetTokens, rateLimitBuckets, userAvatars } from './db-schema'
+
+/**
+ * The one place a background job is declared.
+ *
+ * One of three ways to work off the request path, and the one for *recurring* work:
+ *   - `background-tasks.ts` defers best-effort work inside a single API request. Losing it on a
+ *     restart is acceptable.
+ *   - `outbox/` queues durable one-off work in PostgreSQL. Losing it is not acceptable, so it is
+ *     retried until it succeeds or gives up.
+ *   - this file declares work that happens on a timer, whether or not anyone asked for it.
+ *
+ * A task type is never scheduled; one job here, `outbox:drain`, runs every type.
+ *
+ * **Keep backend services out of the imports in this file.** Tooling outside the backend reads
+ * this list without opening database connections. Reach for `runtime` inside a job body instead of
+ * importing a service at the top.
+ *
+ * Jobs say what to do; they never say when or where. Three processes run this same registry:
+ *   - `cron.ts`      - one-job executor for CLI/system cron or Yandex's HTTP timer adapter
+ *   - `scheduler.ts` - a timer inside a long-running process, for a VPS or a cloud worker
+ *   - `worker.ts`    - a loop, for work that must run more often than once a minute or in parallel
+ *
+ * Adding a job here makes it available to all three. See docs/BACKGROUND_JOBS.md.
+ */
+export type BackgroundJob = (runtime: BackendRuntime, now: Date) => Promise<void>
+
+export const backgroundJobs = {
+  noop: async () => {
+    console.log('Job noop completed.')
+  },
+  'db:ping': async ({ db }) => {
+    await db.execute(sql`SELECT 1`)
+    console.log('Job db:ping completed.')
+  },
+  'auth:sessions:cleanup': async ({ env, db }, now) => {
+    const dayMs = 24 * 60 * 60 * 1000
+    const retentionCutoff = new Date(
+      now.getTime() - env.SESSION_RETENTION_DAYS * dayMs,
+    )
+    const absoluteRetentionCutoff = new Date(
+      now.getTime() - (env.SESSION_ABSOLUTE_TTL_DAYS + env.SESSION_RETENTION_DAYS) * dayMs,
+    )
+    const [sessions, resetTokens, rateLimitWindows] = await Promise.all([
+      db.delete(authSessions).where(or(
+        lt(authSessions.expiresAt, retentionCutoff),
+        lt(authSessions.revokedAt, retentionCutoff),
+        lt(authSessions.createdAt, absoluteRetentionCutoff),
+      )).returning({ id: authSessions.id }),
+      db.delete(passwordResetTokens).where(lt(passwordResetTokens.expiresAt, now))
+        .returning({ id: passwordResetTokens.id }),
+      // A rate-limit window past its end is never read again - every request looks up the window
+      // containing its own clock - so the rows are pure weight. Only RATE_LIMIT_STORE=database
+      // writes them; elsewhere this sweeps an empty table.
+      db.delete(rateLimitBuckets).where(lt(rateLimitBuckets.expiresAt, now))
+        .returning({ policy: rateLimitBuckets.policy }),
+    ])
+    console.log(
+      `Job auth:sessions:cleanup removed ${sessions.length} stale sessions, ${resetTokens.length} expired password reset tokens and ${rateLimitWindows.length} spent rate-limit windows.`,
+    )
+  },
+  'uploads:pending:cleanup': async ({ db, privateStorage }, now) => {
+    // An upload whose signed URL has expired can never be finalized, so its row and any bytes
+    // that did land are junk. Objects go first: a row deleted before its object would leave
+    // storage holding a file nothing points at and nothing will ever look for again.
+    const abandoned = await db.select({ id: userAvatars.id, objectKey: userAvatars.objectKey })
+      .from(userAvatars)
+      .where(and(eq(userAvatars.state, 'pending'), lt(userAvatars.expiresAt, new Date(now.getTime() - 60 * 60 * 1000))))
+      .limit(500)
+
+    // Only rows whose object is actually gone are deleted. Dropping a row after a failed object
+    // delete would strand that object forever: the row is the only record of its key, so nothing
+    // would ever look for it again. Keeping the row means the next run simply retries. Deletes
+    // are idempotent, so a missing object still counts as removed and cannot block the queue.
+    const deletedIds: string[] = []
+    for (const upload of abandoned) {
+      try {
+        await privateStorage.storage.deleteObject(upload.objectKey)
+        deletedIds.push(upload.id)
+      } catch (error) {
+        console.error(`Job uploads:pending:cleanup could not delete ${upload.objectKey}:`, error)
+      }
+    }
+
+    const rows = deletedIds.length > 0
+      ? await db.delete(userAvatars).where(inArray(userAvatars.id, deletedIds)).returning({ id: userAvatars.id })
+      : []
+
+    console.log(
+      `Job uploads:pending:cleanup removed ${rows.length} abandoned uploads, and left ${abandoned.length - deletedIds.length} to retry.`,
+    )
+  },
+  'outbox:drain': async (runtime, now) => {
+    const { drainOptionsFromEnv, drainTaskOutbox } = await import('./outbox')
+    const metrics = await drainTaskOutbox(runtime, {
+      ...drainOptionsFromEnv(runtime.env),
+      now,
+    })
+
+    // One line, because an operator reads these in a log: `backlog` climbing across runs means
+    // the drain cannot keep up, and `unhandled` above zero means rows are queued for a task type
+    // this deployment has no handler for.
+    console.log('Job outbox:drain completed.', metrics)
+  },
+} satisfies Record<string, BackgroundJob>
+
+export type BackgroundJobName = keyof typeof backgroundJobs
+
+export function backgroundJobNames(): BackgroundJobName[] {
+  return Object.keys(backgroundJobs) as BackgroundJobName[]
+}
+
+export function isBackgroundJobName(value: string): value is BackgroundJobName {
+  // `value in backgroundJobs` would also accept 'constructor', 'toString' and the rest of
+  // Object.prototype, and those would then run nothing and exit 0 - a provider timer would
+  // report a healthy job every night while doing no work.
+  return Object.hasOwn(backgroundJobs, value)
+}
+
+export async function runBackgroundJob(
+  jobName: string,
+  runtime: BackendRuntime,
+  now = new Date(),
+) {
+  if (!isBackgroundJobName(jobName)) {
+    throw new Error(
+      `Unknown job "${jobName}". Available jobs: ${backgroundJobNames().join(', ')}`,
+    )
+  }
+
+  await backgroundJobs[jobName](runtime, now)
+}

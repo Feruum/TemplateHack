@@ -1,0 +1,53 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "stream",
+  "remoteCache": { "enabled": false },
+  "globalDependencies": [".env", ".env.*", "bunfig.toml", "styles/vendor/shadcn/tailwind.css"],
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "//#dev:setup": {
+      "cache": false,
+      "passThroughEnv": ["*"]
+    },
+    "dev": {
+      "dependsOn": ["//#dev:setup"],
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["*"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
+      "env": ["VITE_*", "PUBLIC_*"],
+      "outputs": []
+    },
+    "@web-app-demo/webapp#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
+      "env": ["VITE_*"],
+      "outputs": ["dist/**"]
+    },
+    "@web-app-demo/website#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.*"],
+      "env": ["PUBLIC_*"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "cache": false,
+      "passThroughEnv": ["*"]
+    },
+    "test:build-contracts": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "passThroughEnv": ["*"]
+    }
+  }
+}

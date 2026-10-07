@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/user/auth-service/gen/auth/v1;authv1";
+
+// IdentityService handles user authentication and session management
+// backed by Ory Kratos.
+service IdentityService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc WhoAmI(WhoAmIRequest) returns (WhoAmIResponse);
+}
+
+// PermissionService handles Zanzibar-style checks
+// backed by SpiceDB.
+service PermissionService {
+  rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+}
+
+message LoginRequest {
+  string identifier = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string session_token = 1;
+  User user = 2;
+}
+
+message WhoAmIRequest {
+  string session_token = 1;
+}
+
+message WhoAmIResponse {
+  User user = 1;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  map<string, string> traits = 3;
+}
+
+message CheckPermissionRequest {
+  string resource_type = 1;
+  string resource_id = 2;
+  string permission = 3;
+  string subject_type = 4;
+  string subject_id = 5;
+}
+
+message CheckPermissionResponse {
+  bool allowed = 1;
+}

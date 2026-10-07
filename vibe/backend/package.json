@@ -1,0 +1,48 @@
+{
+  "name": "@web-app-demo/backend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun scripts/dev.mjs",
+    "start": "bun run start:api",
+    "start:api": "bun src/index.ts",
+    "start:worker": "bun src/worker.ts",
+    "start:scheduler": "bun src/scheduler.ts",
+    "start:cron": "bun src/cron.ts",
+    "start:raw": "bun src/index.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "bun run test:unit && bun run test:integration",
+    "test:unit": "bun scripts/test-unit.mjs",
+    "test:integration": "bun scripts/test-integration.mjs",
+    "test:live": "bun scripts/test-live.mjs",
+    "smoke:docker": "bun scripts/docker-smoke.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:seed": "bun scripts/seed-development.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1101.0",
+    "@aws-sdk/s3-request-presigner": "^3.1101.0",
+    "@hono/zod-openapi": "^1.4.0",
+    "@hono/zod-validator": "^0.9.0",
+    "@smithy/signature-v4": "^5.6.5",
+    "@web-app-demo/contracts": "workspace:*",
+    "croner": "^10.0.1",
+    "drizzle-orm": "0.45.3",
+    "dotenv": "^17.4.2",
+    "hono": "^4.12.34",
+    "jose": "^6.2.7",
+    "pg": "^8.20.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.0",
+    "@types/pg": "^8.20.3",
+    "drizzle-kit": "0.31.11",
+    "typescript": "~6.0.3"
+  }
+}

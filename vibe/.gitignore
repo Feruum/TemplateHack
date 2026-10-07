@@ -1,0 +1,34 @@
+# Dependencies and generated output (also used by Turbo without a Git checkout).
+node_modules/
+dist/
+build/
+.astro/
+.turbo/
+*.tsbuildinfo
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+.scratch/
+*.log
+
+# Local configuration and private data.
+.env
+.env.*
+!.env.example
+/uploads/
+.data/
+.storage/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# Local infrastructure state.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+*.backend.hcl

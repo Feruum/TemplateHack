@@ -1,0 +1,4 @@
+{
+  "apps/agent": "1.0.0",
+  "libs/shared-protos": "1.0.0"
+}

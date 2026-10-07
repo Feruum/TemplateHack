@@ -1,0 +1,42 @@
+# Dependencies, build output, and local test artifacts.
+node_modules/
+dist/
+build/
+.next/
+.astro/
+.turbo/
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+.artifacts/
+.scratch/
+*.tsbuildinfo
+*.log
+
+# Local settings, credentials, and persistent data.
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.data/
+.storage/
+uploads/
+
+# Local infrastructure state.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+*.backend.hcl
+
+# Editor and operating-system files.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

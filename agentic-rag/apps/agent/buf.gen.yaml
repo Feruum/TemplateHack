@@ -1,0 +1,6 @@
+version: v1
+plugins:
+  - plugin: buf.build/protocolbuffers/python:v29.3
+    out: src/agent/gen
+  - plugin: buf.build/connectrpc/python:v0.6.0
+    out: src/agent/gen

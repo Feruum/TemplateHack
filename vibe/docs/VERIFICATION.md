@@ -39,7 +39,7 @@ The test stack and its volumes were removed after each run. The local developmen
 ## Fixes
 
 - Root Turbo commands explicitly load the root `.env` through Node before starting workspaces. Previously, the backend could start without `DATABASE_URL` or `JWT_SECRET`, and frontend URL settings could be omitted. An isolated real-Turbo regression test checks propagation and reproduces the original failure.
-- Standalone `dev:backend`, `dev:webapp`, `dev:website`, and `dev:seed` commands also load the root `.env`. All four new regression scenarios failed before the fix and passed afterward.
+- Standalone `dev:backend`, `dev:webapp`, `dev:website`, and `dev:seed` commands were updated to load the root `.env`. The original probes checked exit codes only. The 2026-10-12 follow-up below corrects a help-only false positive and verifies that the child program actually executes.
 - The PostgreSQL initialization script now uses LF line endings. Previously, a Windows bind mount produced `/bin/sh^M: bad interpreter` and left the agent database missing. `.gitattributes` and a regression test preserve the Linux script format.
 - The agent Dockerfile installs dependencies directly from `uv.lock` with `uv sync --frozen`. It no longer resolves and downloads newer versions before reverting to locked versions.
 - Compatible overrides and `bun.lock` were updated for the affected dependencies. Critical findings in `proxy-addr` and `seroval` were resolved along with the other available fixes.
@@ -100,3 +100,41 @@ The README update changed documentation only. The full test results above remain
 | Agent module API without a session | HTTP 401 |
 
 The first site request timed out during cold startup. A subsequent request after warm-up returned HTTP 200. The current configuration still has no real AI provider; account and workspace functionality starts independently of it. Email delivery uses the schema default, `disabled`.
+
+## React/Vite migration — 2026-10-12
+
+The user requested removal of Astro. All thirteen landing sections are React components, and Vite builds the public site. React DOM renders the full landing page to static HTML before publication; the browser hydrates it when idle. The existing page structure, theme, native disclosures, links, metadata, public environment names, and port 4321 are preserved. Astro dependencies, configuration, types, source templates, and generated cache were removed. Static release source now uses `assets/`; no cloud deployment was performed.
+
+| Local check | Result |
+| --- | --- |
+| Full `bun run check` | Passed, exit code 0 |
+| Bun suites | 545 passed, 0 failed, across 85 files |
+| Website tests | 9 passed, including metadata escaping and URL validation |
+| Root environment propagation | 6 passed; each successful case proves execution with a child-output marker |
+| Build contracts and workspace builds | 2 contracts passed; all four workspace builds passed, with local Turbo cache reuse for unchanged outputs |
+| Website Storybook production build | Passed with its isolated Vite configuration |
+| Architecture validation | Passed for 482 source files |
+| Dependency audit | Passed with no known application vulnerabilities and no exceptions |
+| Private configuration scan | No actual local JWT secret or internal agent API key in candidate source or frontend bundles |
+| Development and production-preview HTTP | `/` and `/index.html` returned 200; HEAD returned 200 with no body; an unknown route returned 404 |
+
+The Bun total comprises 125 script tests, 19 contracts, 297 backend unit tests, 20 backend integration tests, 75 webapp tests, and 9 website tests. Backend integration checks used their isolated PostgreSQL test instance. Python tests, account/workspace Chromium scenarios, and provider-backed RAG scenarios were not rerun for this frontend migration; their results above remain dated 2026-10-07.
+
+The installed agent-browser adapter and Chromium checked the local development server and final production preview. Desktop (1440 × 900) hydration and lazy canvas rendering passed without page errors. Mobile (390 × 844) keyboard menu toggles, section navigation, pointer FAQ toggles, and keyboard FAQ closure passed. Initial content and native disclosures also worked with JavaScript requests blocked. Reduced-motion and WebGL-disabled browsers retained the static scene without requesting the canvas chunk; the fresh disabled-WebGL session had no page or console errors. These are local smoke checks, not production-provider or comprehensive accessibility certification.
+
+Runtime verification found and fixed four defects: Bun flags before `run` printed help and exited 0 without launching a workspace; unconditional custom Vite application handling made production preview return 404; dev middleware initially omitted HEAD; and an unclipped launch-kit halo caused four pixels of mobile overflow. A WebGL2 probe also prevents the existing canvas initializer from producing an uncaught rejection when GPU support is disabled. The strengthened environment tests reproduced the help-only failure before the command fix.
+
+The desktop canvas still emits the existing `THREE.Clock` deprecation warning. Vite reports its large lazy 3D chunk; the build contract confirms that this chunk remains separate and is not eagerly preloaded. Both warnings are non-fatal. Real AI and email configuration requirements remain unchanged.
+
+### Full-stack launch after migration
+
+The normal `bun run dev` command rebuilt the agent image, started local Compose services, applied database migrations, and started both Vite servers, Bun API, and scheduler. The first build reported the pinned uv image as missing. Registry inspection confirmed the exact pinned digest, and retrying its pull succeeded; no Dockerfile or dependency version change was needed. The second normal launch succeeded and remains running as a hidden background process. Its launcher record and logs are under the ignored `.artifacts/dev-session-20261012-124646-53d9dc` directory. Development Docker volumes were preserved.
+
+| Endpoint | Observed result |
+| --- | --- |
+| `http://localhost:4321/` | HTTP 200 |
+| `http://localhost:5173/` | HTTP 200 |
+| `http://localhost:3100/health` | HTTP 200 |
+| `http://localhost:8001/health/live` | HTTP 200 |
+| `http://localhost:8001/health/ready` | HTTP 503; embedding settings are still absent |
+| `http://localhost:3100/api/agent/modules` without a session | HTTP 401 |

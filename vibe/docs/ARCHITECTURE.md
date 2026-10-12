@@ -1,12 +1,12 @@
 # Hackathon Starter Architecture
 
-The active project mode is local development. Astro serves the public site, the Vite app serves the signed-in workspace, Bun/Hono owns authentication and API access, and FastAPI/LangGraph hosts modular AI agents. `bun run dev` starts the applications and local stores on loopback addresses. Cloud infrastructure, Azure, the Go authorization service, and the mobile app are outside this launch path.
+The active project mode is local development. React/Vite serves the pre-rendered public site, the Vite app serves the signed-in workspace, Bun/Hono owns authentication and API access, and FastAPI/LangGraph hosts modular AI agents. `bun run dev` starts the applications and local stores on loopback addresses. Cloud infrastructure, Azure, the Go authorization service, and the mobile app are outside this launch path.
 
 ## Components
 
 | Component | Responsibility | Local address |
 | --- | --- | --- |
-| `website` | Public Astro site | `http://localhost:4321` |
+| `website` | Public React/Vite site | `http://localhost:4321` |
 | `webapp` | Signed-in React/Vite workspace | `http://localhost:5173` |
 | `backend` | Bun/Hono, sessions, API, trusted agent proxy | `http://localhost:3000` |
 | `services/agent` | FastAPI/LangGraph, module registry, document processing | `http://localhost:8001` |
@@ -19,7 +19,7 @@ Compose publishes service ports on the local machine. The browser must call `/ap
 
 Bun workspaces manage the JavaScript packages and their dependencies. Turborepo schedules their tasks through the root `turbo.json`. The Python agent remains a Compose service and uses its own Python dependency lockfile.
 
-`bun run dev` runs the root `dev:setup` task once before any workspace dev server starts. That task calls `scripts/dev-local.mjs` to start PostgreSQL, Chroma, and the agent through Compose, then apply Drizzle migrations. After setup succeeds, Turbo starts the Bun backend, Vite, and Astro in parallel. The backend's own runner continues to supervise its API and scheduler together. Ctrl+C stops the app processes; Docker services remain running and their volumes retain local state.
+`bun run dev` runs the root `dev:setup` task once before any workspace dev server starts. That task calls `scripts/dev-local.mjs` to start PostgreSQL, Chroma, and the agent through Compose, then apply Drizzle migrations. After setup succeeds, Turbo starts the Bun backend, the two Vite frontends in parallel. The backend's own runner continues to supervise its API and scheduler together. Ctrl+C stops the app processes; Docker services remain running and their volumes retain local state.
 
 Build and type-check tasks follow workspace dependency order. Backend and webapp depend on the shared contracts package. Frontend builds cache their `dist` output locally under `.turbo`; backend and contracts builds only type-check and emit no build artifacts. Remote caching is disabled. Build cache keys account for public frontend environment variables and `.env` files. Dev, setup, and build-contract test tasks are uncached. See [COMMANDS.md](COMMANDS.md#turborepo) for filters and cache controls.
 

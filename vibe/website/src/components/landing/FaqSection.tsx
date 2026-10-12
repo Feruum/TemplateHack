@@ -1,7 +1,7 @@
----
+import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
 
-import SectionIntro from './SectionIntro.astro'
+import SectionIntro from './SectionIntro'
 
 const questions = [
   {
@@ -18,7 +18,7 @@ const questions = [
   },
   {
     question: 'Какие технологии уже настроены?',
-    answer: 'Astro для публичного сайта, React и Vite для рабочей области, Bun и Hono для API, Drizzle и PostgreSQL для данных. Python и LangGraph запускают подключаемые модули агента.',
+    answer: 'React и Vite для публичного сайта и рабочей области, Bun и Hono для API, Drizzle и PostgreSQL для данных. Python и LangGraph запускают подключаемые модули агента.',
   },
   {
     question: 'Как проверяются изменения агента?',
@@ -29,11 +29,12 @@ const questions = [
     answer: 'Для первых страниц и небольших изменений опыт программирования не обязателен. Перед запуском платежей, работы с персональными данными или сложных интеграций стоит привлечь разработчика.',
   },
 ]
----
 
-<section class="border-b bg-muted/35 py-20 sm:py-24" id="faq" aria-labelledby="faq-title">
-  <div class="site-container grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
-    <div class="lg:sticky lg:top-28 lg:self-start">
+export default function FaqSection() {
+  return (
+<section className="border-b bg-muted/35 py-20 sm:py-24" id="faq" aria-labelledby="faq-title">
+  <div className="site-container grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
+    <div className="lg:sticky lg:top-28 lg:self-start">
       <SectionIntro
         eyebrow="Частые вопросы"
         title="Что знать перед началом"
@@ -42,18 +43,20 @@ const questions = [
       />
     </div>
 
-    <div class="overflow-hidden rounded-2xl border bg-card px-5 sm:px-7">
+    <div className="overflow-hidden rounded-2xl border bg-card px-5 sm:px-7">
       {questions.map(({ question, answer }, index) => (
-        <details class:list={['group py-5 sm:py-6', index > 0 && 'border-t']}>
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 font-heading text-base font-bold focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-lg [&::-webkit-details-marker]:hidden">
+        <details key={index} className={cn('group py-5 sm:py-6', index > 0 && 'border-t')}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-heading text-base font-bold focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-lg [&::-webkit-details-marker]:hidden">
             {question}
-            <span class="grid size-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/70 transition-transform duration-200 group-open:rotate-45">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/70 transition-transform duration-200 group-open:rotate-45">
               <Plus className="size-4" aria-hidden="true" />
             </span>
           </summary>
-          <p class="max-w-2xl pt-4 pr-12 leading-7 text-muted-foreground">{answer}</p>
+          <p className="max-w-2xl pt-4 pr-12 leading-7 text-muted-foreground">{answer}</p>
         </details>
       ))}
     </div>
   </div>
 </section>
+  )
+}

@@ -31,6 +31,7 @@ function runEnvironmentProbe(command, workspace = 'backend', workspaceTask = 'de
       const valid = process.env.DATABASE_URL === 'workspace-env-fixture'
         && process.env.JWT_SECRET === 'workspace-env-fixture';
       if (!valid) process.stderr.write('Root configuration did not reach the workspace.\\n');
+      if (valid) process.stdout.write('ROOT_ENV_PROBE_EXECUTED\\n');
       process.exitCode = valid ? 0 : 1;
     `)
     const env = { ...process.env, TURBO_TELEMETRY_DISABLED: '1' }
@@ -48,6 +49,7 @@ test('root development command passes .env settings into another workspace', () 
   const result = runEnvironmentProbe(scripts.dev)
   expect(result.error).toBeUndefined()
   expect(result.status).toBe(0)
+  expect(result.stdout).toContain('ROOT_ENV_PROBE_EXECUTED')
 }, 30_000)
 
 test('the environment regression probe detects the original bare Turbo command', () => {
@@ -61,6 +63,7 @@ for (const workspace of ['backend', 'webapp', 'website']) {
     const result = runEnvironmentProbe(scripts[`dev:${workspace}`], workspace)
     expect(result.error).toBeUndefined()
     expect(result.status).toBe(0)
+    expect(result.stdout).toContain('ROOT_ENV_PROBE_EXECUTED')
   }, 30_000)
 }
 
@@ -68,4 +71,5 @@ test('the development seed command receives the root .env', () => {
   const result = runEnvironmentProbe(scripts['dev:seed'], 'backend', 'db:seed')
   expect(result.error).toBeUndefined()
   expect(result.status).toBe(0)
+  expect(result.stdout).toContain('ROOT_ENV_PROBE_EXECUTED')
 }, 30_000)

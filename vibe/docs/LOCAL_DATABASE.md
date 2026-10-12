@@ -34,7 +34,7 @@ bun install --frozen-lockfile
 bun run dev
 ```
 
-The script starts Compose services `postgres`, `chroma`, and `agent`. It applies Drizzle migrations, then starts the Bun API and scheduler, Vite, and Astro. Default ports:
+The script starts Compose services `postgres`, `chroma`, and `agent`. It applies Drizzle migrations, then starts the Bun API and scheduler, the two Vite frontends. Default ports:
 
 | Service | Address | Port variable |
 | --- | --- | --- |
@@ -55,8 +55,8 @@ docker compose stop postgres chroma agent
 The web app tables are defined in `backend/src/db-schema.ts`. Drizzle Kit generates migrations in `backend/drizzle/`:
 
 ```powershell
-bun --cwd backend --env-file ../.env run db:generate
-bun --cwd backend --env-file ../.env run db:migrate
+bun run --cwd backend --env-file=../.env db:generate
+bun run --cwd backend --env-file=../.env db:migrate
 ```
 
 `db:push` syncs the schema directly and is intended only for temporary local experiments. For normal development, generate a migration, review the SQL, and apply it with `db:migrate`.

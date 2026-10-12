@@ -1,8 +1,8 @@
 # build output
 dist/
 storybook-static/
-# generated types
-.astro/
+# local build artifacts
+.artifacts/
 
 # dependencies
 node_modules/

@@ -1,17 +1,17 @@
----
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import SectionIntro from './SectionIntro.astro'
+import SectionIntro from './SectionIntro'
 
 const metrics = [
   ['Продолжить', 'ставить агенту новые задачи в том же проекте'],
   ['Передать', 'исходный код разработчику без переноса из конструктора'],
   ['Опубликовать', 'разместить сайт и сервер на хостинге, а мобильное приложение — в магазинах приложений'],
 ]
----
 
-<section class="border-b py-20 sm:py-24" id="results" aria-labelledby="results-title">
-  <div class="site-container">
+export default function ProofSection() {
+  return (
+<section className="border-b py-20 sm:py-24" id="results" aria-labelledby="results-title">
+  <div className="site-container">
     <div>
       <SectionIntro
         align="center"
@@ -22,11 +22,11 @@ const metrics = [
       />
     </div>
 
-    <div class="mt-12 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+    <div className="mt-12 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
       <Card className="glow-surface justify-between bg-[#0d0d0d] text-white ring-white/12">
         <CardContent className="flex h-full flex-col justify-between gap-10 p-7 sm:p-9">
-          <p class="text-sm font-bold tracking-[0.16em] text-white/55 uppercase">Без закрытого конструктора</p>
-          <p class="glow-text font-heading text-2xl leading-snug font-bold text-balance sm:text-3xl">
+          <p className="text-sm font-bold tracking-[0.16em] text-white/55 uppercase">Без закрытого конструктора</p>
+          <p className="glow-text font-heading text-2xl leading-snug font-bold text-balance sm:text-3xl">
             Проект состоит из обычных исходных файлов. Их можно хранить в своём репозитории,
             открывать в редакторе и передавать разработчику.
           </p>
@@ -36,10 +36,10 @@ const metrics = [
       <Card>
         <CardContent className="flex h-full flex-col justify-center p-7 sm:p-9">
           {metrics.map(([value, label], index) => (
-            <div>
+            <div key={index}>
               {index > 0 && <Separator className="my-6" />}
-              <p class="glow-text font-heading text-4xl font-bold tracking-tight">{value}</p>
-              <p class="mt-2 text-sm leading-6 text-muted-foreground">{label}</p>
+              <p className="glow-text font-heading text-4xl font-bold tracking-tight">{value}</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{label}</p>
             </div>
           ))}
         </CardContent>
@@ -47,3 +47,5 @@ const metrics = [
     </div>
   </div>
 </section>
+  )
+}

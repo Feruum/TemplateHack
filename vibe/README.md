@@ -4,7 +4,7 @@
   <img src="docs/assets/vibe_tmpl_schema.png" alt="Vibe Coding Template architecture diagram" width="100%">
 </p>
 
-A local-first starter for hackathon projects. Astro serves the public site, Vite provides the signed-in workspace, Bun/Hono owns authentication and API access, and a Python/LangGraph service hosts pluggable agent modules. The first module answers questions from private PDF and TXT uploads. Bun workspaces manage JavaScript dependencies, and Turborepo coordinates development tasks and caches builds locally.
+A local-first starter for hackathon projects. React/Vite serves the pre-rendered public site, Vite provides the signed-in workspace, Bun/Hono owns authentication and API access, and a Python/LangGraph service hosts pluggable agent modules. The first module answers questions from private PDF and TXT uploads. Bun workspaces manage JavaScript dependencies, and Turborepo coordinates development tasks and caches builds locally.
 
 [AGENTS.md](AGENTS.md) defines the development rules. The active launch path is local. Cloud infrastructure and the mobile branch are not part of this starter's first run.
 
@@ -12,11 +12,15 @@ This application is stored under `vibe/` in [Feruum/TemplateHack](https://github
 
 ## Current status and stack
 
-The full local verification passed on 2026-10-07: 543 Bun tests, 34 Python tests, 10 Chromium scenarios, 2 build-contract checks, workspace type checks, lint, builds, and the application dependency audit. Registration, sessions, profile/avatars, user/admin access, and the local API/scheduler work. The runtime was started and its HTTP endpoints checked again on 2026-10-08.
+The React/Vite migration check passed on 2026-10-12: 545 Bun tests, 2 build-contract checks, workspace type checks, lint, builds, the website Storybook build, and the application dependency audit. Public-site browser checks passed for desktop/mobile navigation, FAQ controls, hydration, and JavaScript/reduced-motion/WebGL fallbacks. The public site and workspace now use the same React/Vite framework stack.
+
+The broader 2026-10-07 audit also passed 34 Python tests and 10 account/workspace Chromium scenarios. Registration, sessions, profile/avatars, user/admin access, and the local API/scheduler were covered by that audit. These older results retain their date; the migration did not rerun the Python or RAG suites.
+
+The complete local stack was restarted on 2026-10-12. The site, workspace, API health, and agent liveness returned HTTP 200. Agent readiness still returned HTTP 503 without embedding settings. Development data volumes were preserved.
 
 The RAG module is implemented and passed 12 runtime checks for PDF/TXT, indexing, streaming, citations, conversation persistence, and owner isolation with a controlled AI provider. The current local `.env` has no real LLM or embedding settings: chat returns `LLM_NOT_CONFIGURED`, and full agent readiness returns HTTP 503 until embeddings are configured. Password-reset mail defaults to disabled. Real cloud integrations, payments, and mobile are outside this verified local launch.
 
-The active stack is TypeScript/Bun/Hono/Drizzle/PostgreSQL for the API; React 19/Vite 8/TanStack/Tailwind 4 for the workspace; Astro 7/React/Three.js for the public site; and Python 3.12/FastAPI/LangChain/LangGraph/SQLAlchemy/Chroma for the agent. Docker Compose, uv, Bun workspaces, and Turborepo manage the local environment. The [workspace README](https://github.com/Feruum/TemplateHack#technology-stack) contains the complete stack and capability-status tables; [VERIFICATION.md](docs/VERIFICATION.md) contains the check details.
+The active stack is TypeScript/Bun/Hono/Drizzle/PostgreSQL for the API; React 19/Vite 8/TanStack/Tailwind 4 for the workspace; React 19/Vite 8/Three.js for the public site; and Python 3.12/FastAPI/LangChain/LangGraph/SQLAlchemy/Chroma for the agent. Docker Compose, uv, Bun workspaces, and Turborepo manage the local environment. The [workspace README](https://github.com/Feruum/TemplateHack#technology-stack) contains the complete stack and capability-status tables; [VERIFICATION.md](docs/VERIFICATION.md) contains the check details.
 
 ## Applications
 
@@ -24,17 +28,17 @@ The active stack is TypeScript/Bun/Hono/Drizzle/PostgreSQL for the API; React 19
 | --- | --- |
 | [backend](backend/README.md) | Bun/Hono, Drizzle/PostgreSQL, sessions, and the trusted agent proxy |
 | [webapp](webapp/README.md) | React/Vite, TanStack; CSR with registration and sign-in |
-| [website](website/README.md) | Astro; public pages, content, and storefront |
+| [website](website/README.md) | React/Vite with pre-rendered HTML; public pages and content |
 | [services/agent](services/agent/README.md) | FastAPI/LangGraph, module registry, RAG, local Chroma and file storage |
 | [mobile/README.md](mobile/README.md) | Guide to the Expo application on the `mobile` branch |
 | [packages/contracts](packages/contracts/README.md) | Shared Zod schemas and TypeScript API types |
 
 ## Choose between `webapp` and `website`
 
-- `website`: public pages, SEO, link previews, and catalog. Use Astro SSG by default. Use SSR or hybrid rendering when needed.
+- `website`: public pages, SEO, link previews, and catalog. Use React/Vite with pre-rendered HTML by default. Use SSR or hybrid rendering when needed.
 - `webapp`: screens after sign-in, user accounts, administration, and checkout without SEO.
 
-A marketplace usually needs both. Do not move SEO into CSR or the entire account area into Astro. See [ARCHITECTURE.md](docs/ARCHITECTURE.md#contracts-and-web-apps) for framework selection.
+A marketplace usually needs both. Do not move SEO into CSR or the entire account area into the public website. See [ARCHITECTURE.md](docs/ARCHITECTURE.md#contracts-and-web-apps) for framework selection.
 
 Before work on data, carts, orders, or payments, read [WEB_SURFACES.md](docs/WEB_SURFACES.md). The authenticated webapp and backend own the single browser checkout. Website can pass an anonymous selection. Backend is the data source. Mobile has separate native payments. Store subscriptions are disabled on the `mobile` branch. Add other payment methods according to product needs and platform rules.
 
@@ -57,11 +61,11 @@ Without model settings, the applications and account features still start, but c
 bun run dev
 ```
 
-Turborepo first runs the shared setup task once: Docker Compose starts PostgreSQL, Chroma, and the Python agent, then Drizzle applies migrations. After setup succeeds, Turbo starts the Bun API/scheduler, Vite app, and Astro site in parallel. Ctrl+C stops the app processes. The Docker services stay running, and Docker volumes retain the database, vectors, and uploaded files between runs.
+Turborepo first runs the shared setup task once: Docker Compose starts PostgreSQL, Chroma, and the Python agent, then Drizzle applies migrations. After setup succeeds, Turbo starts the Bun API/scheduler, Vite app, and React/Vite site in parallel. Ctrl+C stops the app processes. The Docker services stay running, and Docker volumes retain the database, vectors, and uploaded files between runs.
 
 Open the local apps here:
 
-- Public Astro site: <http://localhost:4321>
+- Public React/Vite site: <http://localhost:4321>
 - Signed-in workspace: <http://localhost:5173>
 - Bun API: <http://localhost:3000>
 - Internal agent service: <http://localhost:8001> (called by Bun; the browser uses `/api/agent`)

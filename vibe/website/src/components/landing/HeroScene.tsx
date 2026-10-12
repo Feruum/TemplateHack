@@ -17,7 +17,18 @@ export default function HeroScene() {
         desktop: window.matchMedia('(min-width: 1024px)'),
         motion: window.matchMedia('(prefers-reduced-motion: no-preference)'),
       },
-      load: () => import('./HeroSceneCanvas'),
+      load: async () => {
+        // Probe before loading Three.js: Canvas initialization can reject outside
+        // React's error boundaries when the browser disables WebGL.
+        const context = document.createElement('canvas').getContext('webgl2', {
+          alpha: true,
+          antialias: true,
+          powerPreference: 'high-performance',
+        })
+        if (!context) throw new Error('WebGL2 is unavailable')
+        context.getExtension('WEBGL_lose_context')?.loseContext()
+        return import('./HeroSceneCanvas')
+      },
       onEligibilityChange: (nextEligible) => {
         eligibilityGeneration.current += 1
         setEligible(nextEligible)

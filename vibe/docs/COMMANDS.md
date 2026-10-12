@@ -11,7 +11,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 bun run dev
 ```
 
-`bun run dev` uses Turborepo to run the shared `dev:setup` task once. Setup starts PostgreSQL, Chroma, and FastAPI through Docker Compose and applies Drizzle migrations. After setup succeeds, Turbo starts the Bun API/scheduler, Vite, and Astro in parallel. `bun run dev:local` is an alias for the same workflow. See the [README quick start](../README.md#quick-start) and [LOCAL_DATABASE.md](LOCAL_DATABASE.md).
+`bun run dev` uses Turborepo to run the shared `dev:setup` task once. Setup starts PostgreSQL, Chroma, and FastAPI through Docker Compose and applies Drizzle migrations. After setup succeeds, Turbo starts the Bun API/scheduler, the two Vite frontends in parallel. `bun run dev:local` is an alias for the same workflow. See the [README quick start](../README.md#quick-start) and [LOCAL_DATABASE.md](LOCAL_DATABASE.md).
 
 Ctrl+C stops the application processes. Docker services remain running. To stop those services while preserving their volumes, run `docker compose stop agent chroma postgres`.
 
@@ -23,7 +23,7 @@ Ctrl+C stops the application processes. Docker services remain running. To stop 
 | `bun run dev:setup` | Start Docker services and apply migrations, without starting the web apps or Bun API |
 | `bun run dev:backend` | Standalone Bun API and scheduler; no infrastructure setup |
 | `bun run dev:webapp` | Standalone signed-in Vite app; no infrastructure setup |
-| `bun run dev:website` | Standalone public Astro site; no infrastructure setup |
+| `bun run dev:website` | Standalone public React/Vite site; no infrastructure setup |
 | `bun run build` | Build workspace apps through Turbo with local caching |
 | `bun run typecheck` | Type-check workspace projects through Turbo |
 | `bun run architecture:check` | Check module import boundaries |
@@ -63,16 +63,16 @@ Turbo stores its cache under `.turbo`; remote caching is disabled. Frontend buil
 Run backend commands from the root:
 
 ```powershell
-bun --cwd backend --env-file ../.env run db:generate
-bun --cwd backend --env-file ../.env run db:migrate
-bun --cwd backend --env-file ../.env run db:push
-bun --cwd backend --env-file ../.env run db:studio
-bun --cwd backend --env-file ../.env run db:seed
+bun run --cwd backend --env-file=../.env db:generate
+bun run --cwd backend --env-file=../.env db:migrate
+bun run --cwd backend --env-file=../.env db:push
+bun run --cwd backend --env-file=../.env db:studio
+bun run --cwd backend --env-file=../.env db:seed
 ```
 
 `db:generate` creates a migration from `backend/src/db-schema.ts` in `backend/drizzle/`. Review the generated SQL before applying it. `db:migrate` applies migrations to the local PostgreSQL database. `db:push` changes the schema directly and is for local experiments. The development seed creates demo accounts when backend seed values are configured.
 
-These examples explicitly load the root `.env` after selecting `backend/`. Omit `--env-file ../.env` when supplying the settings through your shell or using a separate `backend/.env`. Root `dev:<workspace>` and `dev:seed` shortcuts also load the shared `.env`; they do not start infrastructure. Direct workspace commands such as `bun run --cwd backend dev` require their own workspace environment or exported settings.
+These examples explicitly load the root `.env` after selecting `backend/`. Omit `--env-file=../.env` when supplying the settings through your shell or using a separate `backend/.env`. Keep `run` before the workspace and environment flags so Bun executes the requested script. Root `dev:<workspace>` and `dev:seed` shortcuts also load the shared `.env`; they do not start infrastructure. Direct workspace commands such as `bun run --cwd backend dev` require their own workspace environment or exported settings.
 
 The agent uses a separate `agent` database. FastAPI creates its document and LangGraph checkpoint tables at startup. See [LOCAL_DATABASE.md](LOCAL_DATABASE.md) to reset these stores.
 

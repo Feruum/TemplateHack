@@ -2552,7 +2552,7 @@ async function publishYandexStatic(
     {
       distDirectory: resolve(artifactRoot, 'website'),
       bucket: outputs.website_bucket,
-      immutableDirectory: '_astro',
+      immutableDirectory: 'assets',
     },
   ]
   for (const surface of surfaces) {

@@ -1,8 +1,7 @@
----
 import { BriefcaseBusiness, Rocket, Workflow } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import SectionIntro from './SectionIntro.astro'
+import SectionIntro from './SectionIntro'
 
 const audiences = [
   {
@@ -27,10 +26,11 @@ const audiences = [
     note: 'Одинаковая основа для проектов',
   },
 ]
----
 
-<section class="border-b bg-muted/35 py-20 sm:py-24" id="audience" aria-labelledby="audience-title">
-  <div class="site-container">
+export default function AudienceSection() {
+  return (
+<section className="border-b bg-muted/35 py-20 sm:py-24" id="audience" aria-labelledby="audience-title">
+  <div className="site-container">
     <div>
       <SectionIntro
         align="center"
@@ -41,21 +41,21 @@ const audiences = [
       />
     </div>
 
-    <div class="mt-12 grid gap-5 lg:grid-cols-3">
+    <div className="mt-12 grid gap-5 lg:grid-cols-3">
       {audiences.map(({ icon: Icon, number, title, description, note }) => (
-        <Card className="h-full bg-card py-0">
+        <Card key={title} className="h-full bg-card py-0">
           <CardHeader className="flex min-h-24 flex-row items-center justify-between border-b bg-gradient-to-br from-white/8 via-transparent to-transparent p-6">
-            <span class="grid size-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15">
+            <span className="grid size-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15">
               <Icon className="size-5" aria-hidden="true" />
             </span>
-            <span class="rounded-full border border-white/15 px-3 py-1.5 font-heading text-xs font-bold tracking-widest text-white/70 tabular-nums">
+            <span className="rounded-full border border-white/15 px-3 py-1.5 font-heading text-xs font-bold tracking-widest text-white/70 tabular-nums">
               {number}
             </span>
           </CardHeader>
           <CardContent className="flex h-full flex-col p-6">
             <CardTitle className="text-xl font-bold">{title}</CardTitle>
-            <p class="mt-3 flex-1 leading-6 text-muted-foreground">{description}</p>
-            <p class="mt-8 border-t pt-4 text-xs font-bold tracking-wide text-white/55 uppercase">
+            <p className="mt-3 flex-1 leading-6 text-muted-foreground">{description}</p>
+            <p className="mt-8 border-t pt-4 text-xs font-bold tracking-wide text-white/55 uppercase">
               {note}
             </p>
           </CardContent>
@@ -64,3 +64,5 @@ const audiences = [
     </div>
   </div>
 </section>
+  )
+}

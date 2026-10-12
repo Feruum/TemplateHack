@@ -1,8 +1,7 @@
----
 import { Blocks, Layers3, Palette } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import SectionIntro from './SectionIntro.astro'
+import SectionIntro from './SectionIntro'
 
 const roles = [
   {
@@ -21,10 +20,11 @@ const roles = [
     description: 'В шаблоне уже выбраны технологии, связаны части проекта и описано, где и как агенту менять код.',
   },
 ]
----
 
-<section class="border-b py-20 sm:py-24" id="features" aria-labelledby="features-title">
-  <div class="site-container">
+export default function FeatureGrid() {
+  return (
+<section className="border-b py-20 sm:py-24" id="features" aria-labelledby="features-title">
+  <div className="site-container">
     <div>
       <SectionIntro
         align="center"
@@ -34,20 +34,22 @@ const roles = [
         description="Шаблон даёт готовую техническую основу: вам не нужно выбирать технологии, а агенту уже описано, где и как менять код."
       />
     </div>
-    <div class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {roles.map(({ icon: Icon, title, description }) => (
-        <Card className="h-full transition-all duration-200 hover:-translate-y-1 hover:ring-white/25">
+        <Card key={title} className="h-full transition-all duration-200 hover:-translate-y-1 hover:ring-white/25">
           <CardHeader>
-            <span class="mb-3 grid size-10 place-items-center rounded-xl bg-white/10 text-white">
+            <span className="mb-3 grid size-10 place-items-center rounded-xl bg-white/10 text-white">
               <Icon className="size-5" aria-hidden="true" />
             </span>
             <CardTitle className="text-lg font-bold">{title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p class="leading-6 text-muted-foreground">{description}</p>
+            <p className="leading-6 text-muted-foreground">{description}</p>
           </CardContent>
         </Card>
       ))}
     </div>
   </div>
 </section>
+  )
+}

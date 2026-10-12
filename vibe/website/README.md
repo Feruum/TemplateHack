@@ -1,124 +1,52 @@
-# Публичный сайт
+# Public React website
 
-`website` — Astro-проект для страниц с SEO: лендингов, контента и публичного каталога, в том числе маркетплейса. По умолчанию это SSG. Авторизованное CSR-приложение находится в `webapp`.
+The public site uses React 19, Vite 8, Tailwind CSS 4, and the existing shadcn/Radix/Base UI components. Astro has been removed at the user's request. The signed-in workspace remains a separate React/Vite application in `webapp/`.
 
-До добавления данных backend, корзины, заказов, подписок, доступа и оплаты прочитай [docs/WEB_SURFACES.md](../docs/WEB_SURFACES.md).
+## Rendering and behavior
 
-## Стек
+The single landing page is composed by `src/App.tsx` and React sections under `src/components/landing`. The current theme, content, navigation, native mobile menu, FAQ disclosures, and calls to action are preserved.
 
-- Astro: статический SSG по умолчанию, SSR по маршрутам.
-- Tailwind CSS 4 через официальный Vite-плагин.
-- shadcn/ui через React, по умолчанию с серверным рендерингом.
-- React Three Fiber для отдельной декоративной hero-сцены.
-- TypeScript и Vite через Astro.
+`scripts/build.mjs` uses Vite's SSR build API and React DOM `renderToString` to generate complete static HTML. A client build then supplies hashed assets. Temporary server-rendering output is removed after the build. The published output is `website/dist`, including pre-rendered `index.html` and immutable `assets/`; it needs no production Node server.
 
-Лендинг состоит из небольших Astro-секций в `src/components/landing`. Полный реестр shadcn находится в `src/components/ui`. Секции используют нужные примитивы, а продуктовый текст остаётся в статическом HTML.
+The development Vite middleware renders the same application and metadata into HTML. The client entry hydrates it when the browser is idle, with a 2500 ms deadline. Header and FAQ disclosures use native HTML and work before hydration.
 
-Hero всегда включает CSS-версию в SSG и загружает лёгкую оболочку через `client:idle`. Она импортирует R3F/Three Canvas только при ширине от 1024 px и без запроса reduced motion. Мобильные пользователи и пользователи с ограничением анимации не загружают 3D-код. Сцена декоративна: не помещай в неё важный для SEO текст.
+`HeroScene` keeps its complete static visual fallback. Its Three.js canvas is dynamically loaded only for desktop viewports that permit motion and provide a WebGL2 context. Mobile, reduced-motion, and WebGL-disabled browsers retain the fallback; loading errors do not remove it.
 
-Содержимое и композиция находятся в секциях лендинга, общие токены — в `src/styles/global.css`, метаданные — в layout/странице.
+## Commands
 
-## Рендеринг
+Run application commands from `vibe/`:
 
-Astro по умолчанию собирает страницы в статический HTML `website/dist`. Его можно разместить на Static Site или в объектном хранилище с CDN. Серверного адаптера нет: обычные лендинги, контент и стабильный публичный каталог не требуют runtime.
-
-При необходимости `astro build` получает публичные данные backend, проверяет общий контракт и включает результат в HTML. В сборку входят только безопасные публичные данные. Ошибка обязательного снимка данных должна остановить сборку, а не опубликовать пустой каталог.
-
-Для автоматического обновления после записи в БД нужен путь `website:rebuild` из инструкции. Закомментированный обработчик сам по себе не реализует эту возможность.
-
-SSR включается для маршрута через `export const prerender = false`. Он требует Node-адаптер и runtime-сервис вместо Static Site. Не включай SSR только потому, что продукт — маркетплейс. Оставь контент и стабильный каталог статическими. Динамика нужна для живого поиска, персонализации или цен/остатков, где устаревший HTML недопустим.
-
-Выбирай по порядку:
-
-1. SSG с пересборкой и деплоем — для изменений объявлений, категорий и лендинга.
-2. Кэшируемый SSR по запросу с `stale-while-revalidate` — когда полный деплой слишком медленный.
-3. Astro server islands — для небольших динамических фрагментов без SEO: состояния входа или действия с объявлением.
-4. Некэшируемый или персональный SSR — только когда начальный HTML должен отражать текущий запрос.
-
-SSR и server islands требуют адаптер и runtime-хостинг. На чистом Static Site или статическом бакете они не работают. Server islands сохраняют основную страницу статической и формируют по запросу только фрагмент.
-
-Для server islands при кэшировании или постепенном релизе создай постоянный ключ через `astro create-key`. Передай `ASTRO_KEY` как секрет в сборку и runtime. Тогда старый HTML и новый сервер смогут одинаково расшифровать props. Не коммить и не печатай ключ, не используй `PUBLIC_*` и не включай его в статику.
-
-Общий CDN-кэш (`public`, `s-maxage`, `stale-while-revalidate`) разрешён только для анонимного публичного HTML. Персональные страницы и islands требуют `private`, `no-store` или явно поддерживаемой стратегии `Vary: Cookie`/`Authorization`. `ASTRO_KEY` шифрует props и согласует релизы, но не защищает приватность кэша.
-
-Важные для SEO данные должны быть в начальном HTML: title, description, canonical URL, Open Graph/Twitter, имена товаров/категорий, описания и значимые публичные цены. Client/server islands могут дополнять эти данные, но не заменять их.
-
-## Команды
-
-Из корня:
-
-```bash
+```powershell
 bun run dev:website
-bun run typecheck:website
 bun run build:website
+bun run typecheck:website
 bun run test:website
+bun run test:build-contracts
+bun run storybook:website
 ```
 
-Из `website`:
+The public dev server remains at `http://localhost:4321`. The root dev shortcut loads the shared local `.env`. The complete stack starts with `bun run dev`.
 
-```bash
-bun run dev
-bun run typecheck
-bun run build
-bun run test
-bun run preview
-bun run storybook
-bun run storybook:build
-```
+To preview production output, first build, then run `bun run --cwd website preview`. Storybook runs on port 6007 with its own Vite configuration so the website's HTML middleware cannot replace the component catalog.
 
-Страницы находятся в `src/pages`, статические файлы — в `public`.
+## Public settings and metadata
 
-Storybook работает локально на порту `6007` в тёмной монохромной теме сайта. Он содержит React-модули `src/components/ui` и учебные композиции CTA, карточек, FAQ, форм и контента. Astro-секции и страницы туда не входят. Каталог использует официальный React/Vite-рендерер, не добавляет адаптер Astro или гидратацию. Его сборка не входит в `website/dist`.
+- `PUBLIC_WEBAPP_URL`: optional absolute HTTP(S) URL for the workspace action. If unset, that action links to the existing local getting-started section.
+- `PUBLIC_WEBSITE_URL`: optional absolute HTTP(S) site URL for canonical and Open Graph URL tags.
+- Public settings are build-time values. Invalid configured URLs fail the build. Metadata is HTML-escaped before insertion.
 
-## Переменные окружения
+Title, description, Russian language, dark theme, favicon, Open Graph, and Twitter metadata remain in the initial HTML. Vite exposes only its standard public variables and the existing `PUBLIC_*` prefix. Keep all private keys out of public-prefixed variables.
 
-Astro встраивает `PUBLIC_*` при сборке. Не помещай туда секреты, включая `ASTRO_KEY`. Если нужны локальные значения, скопируй [.env.example](.env.example) в `website/.env`.
+## Checks and architecture
 
-- `PUBLIC_WEBSITE_URL`: canonical origin, например `https://www.example.com`. При наличии появляются canonical и `og:url`; без значения их нет.
-- `PUBLIC_WEBAPP_URL`: origin приложения, например `https://app.example.com`. Без него лендинг сохраняет локальную ссылку следующего шага и собирается без webapp. Некорректный абсолютный `http(s)` URL останавливает сборку с именем переменной из `src/lib/landing-actions.ts`.
+The existing website tests cover public-link configuration, hero eligibility/loading, and Storybook inventory. Metadata tests cover escaping and URL validation. Build-contract checks verify pre-rendered content, hashed assets, lazy canvas separation, and exclusion of story-only CSS.
 
-Production-релиз получает оба значения из Terraform.
+Keep account routes, permissions, checkout, and private data in `webapp/` and `backend/`. This migration does not add payments, public API data, or runtime server rendering. See [WEB_SURFACES.md](../docs/WEB_SURFACES.md) and [ARCHITECTURE.md](../docs/ARCHITECTURE.md).
 
-## Деплой
+Static release source retains the existing output directory and public environment names. Cloud deployment was not performed. Request-rendered pages or new routes require a separate recorded product need; this one-page static build does not imply a general SSR routing framework.
 
-Без SSR и server islands каталог `website/dist` полностью статический. По выбору в `CHECKLIST.md` Terraform создаёт App Platform Static Site или бакет Yandex Object Storage.
+## References
 
-Общий релиз передаёт `PUBLIC_WEBSITE_URL` и `PUBLIC_WEBAPP_URL`, пересобирает сайт при изменении любого из них и публикует точный релиз. Без canonical URL соответствующие метаданные не выводятся. Используй `bun run release -- <digitalocean|yandex>` по [инструкции](../docs/DEPLOYMENT.md).
-
-На этих облачных путях обновление означает новый деплой статики или обновление CDN/runtime-кэша. Это не встроенный Next/Vercel ISR.
-
-Автоматическая пересборка — фоновая задача, а не отдельный сервис. Раздел о пересборке сайта в [BACKGROUND_JOBS](../docs/BACKGROUND_JOBS.md) объясняет реализацию и причину, по которой она пока не включена в шаблон.
-
-### Переход на SSR
-
-Переходи только для маршрута с реальной потребностью в серверном рендеринге. Краткая инструкция также есть в `astro.config.mjs`.
-
-1. Установи совместимый Node-адаптер: `bun add @astrojs/node --cwd website`. Проверь диапазон peer-зависимости `astro`: несовпадение major-версий ломает сборку.
-2. В `astro.config.mjs` добавь `adapter: node({ mode: 'standalone' })`, сохранив `output: 'static'`. Сборка создаст `dist/client` и `dist/server`. Статический каталог станет `website/dist/client`.
-3. Добавь динамическому маршруту `export const prerender = false`.
-4. Измени выбранный Terraform-стек: этому приложению нужен Node-сервис/контейнер вместо статического хостинга.
-
-Используй `Cache-Control` и `stale-while-revalidate` перед CDN для свежести динамических страниц. Постраничный ISR — возможность платформ вроде Vercel/Netlify. Его нет в App Platform Static Sites или Yandex Object Storage. Не строй стандартный путь вокруг него.
-
-## Правила работы
-
-Храни здесь UI и контент сайта. Не дублируй сценарии `webapp`. Auth допустим для малых публичных функций: состояния входа в шапке или простого действия с объявлением. Кабинеты покупателя, продавца и администратора, checkout и панели остаются в `webapp`, если нет конкретной SEO-задачи.
-
-Сайт может начать анонимную корзину или выбор предложения. В ней только недоверенные ID и количества. Передавай её в единственный авторизованный checkout `webapp`. Не добавляй сюда создание платежей, ввод карты, окончательные суммы, состояние заказа или webhooks.
-
-При подключении API/DTO явно добавь `@web-app-demo/contracts` и проверь обе стороны контракта. `@astrojs/react` нужен только для интерактивных React-islands.
-
-Astro остаётся стандартом: контент, статика, мало JavaScript и ясная SEO-граница. Next.js выбирай при явной потребности в ISR/кэше под Vercel. TanStack Start — будущий вариант единого React-приложения с выборочным SSR, не стандарт этого шаблона.
-
-## Официальная документация
-
-Правила проекта описаны выше. Поведение Astro проверяй по актуальной документации:
-
-- [Astro](https://docs.astro.build/en/getting-started/)
-- [Структура проекта](https://docs.astro.build/en/basics/project-structure/)
-- [Страницы и маршруты](https://docs.astro.build/en/basics/astro-pages/)
-- [Рендеринг по запросу](https://docs.astro.build/en/guides/on-demand-rendering/)
-- [Node-адаптер](https://docs.astro.build/en/guides/integrations-guide/node/)
-- [Деплой Astro](https://docs.astro.build/en/guides/deploy/)
-- [TypeScript](https://www.typescriptlang.org/docs/)
-- [Vite](https://vite.dev/guide/)
+- [Vite SSR API](https://vite.dev/guide/ssr.html)
+- [React server rendering](https://react.dev/reference/react-dom/server/renderToString)
+- [React hydration](https://react.dev/reference/react-dom/client/hydrateRoot)

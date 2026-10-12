@@ -16,7 +16,7 @@ To work on the backend alone with the shared `vibe/.env`, run these commands fro
 
 ```powershell
 docker compose up -d postgres
-bun --cwd backend --env-file ../.env run db:migrate
+bun run --cwd backend --env-file=../.env db:migrate
 bun run dev:backend
 ```
 
@@ -25,8 +25,8 @@ bun run dev:backend
 Application tables are defined in `src/db-schema.ts`. Create a migration after changing the schema, then apply it:
 
 ```powershell
-bun --cwd backend --env-file ../.env run db:generate
-bun --cwd backend --env-file ../.env run db:migrate
+bun run --cwd backend --env-file=../.env db:generate
+bun run --cwd backend --env-file=../.env db:migrate
 ```
 
 Use `db:studio` to inspect local rows. `db:push` is for disposable experiments only. Do not use it as a replacement for a committed migration.
@@ -56,8 +56,8 @@ The backend sets `X-User-ID` from the verified principal. It never trusts an ide
 bun run --cwd backend typecheck
 bun run --cwd backend test:unit
 bun run --cwd backend test:integration
-bun --cwd backend --env-file ../.env run db:generate
-bun --cwd backend --env-file ../.env run db:migrate
+bun run --cwd backend --env-file=../.env db:generate
+bun run --cwd backend --env-file=../.env db:migrate
 bun run dev:seed
 ```
 

@@ -4,10 +4,10 @@ export const TEMPLATE_ACTION = {
 } as const
 
 /**
- * `PUBLIC_WEBAPP_URL` is build-time configuration read by `src/pages/index.astro`. The unified
+ * `PUBLIC_WEBAPP_URL` is build-time configuration read by the React application. The unified
  * release always sets it to the web app's `https://` origin, and a local or webapp-less build
  * leaves it unset. A value that is set but is not an absolute http(s) URL is a configuration
- * mistake, so this throws and fails `astro build` instead of shipping a call to action that links
+ * mistake, so this throws and fails the static build instead of shipping a call to action that links
  * nowhere.
  */
 export function resolvePublicWebappUrl(value: string | undefined): string | undefined {

@@ -6,13 +6,15 @@ Repository: [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack).
 
 ## What works and what still needs configuration
 
-The active application is `vibe/`. The full local verification on **2026-10-07** passed: **543 Bun tests, 34 Python tests, 10 Chromium scenarios, and 2 build-contract tests**. The separate RAG runtime audit passed 12 checks with a controlled local AI provider. Type checks, lint, workspace builds, and the application dependency audit also passed. See the [verification report](vibe/docs/VERIFICATION.md) for scope and evidence.
+The active application is `vibe/`. The React/Vite migration check on **2026-10-12** passed **545 Bun tests and 2 build-contract tests**, type checks, lint, workspace builds, the website Storybook build, and the dependency audit. Public-site browser checks covered desktop/mobile navigation, FAQ controls, hydration, and static fallback behavior with JavaScript blocked, reduced motion, and WebGL disabled.
 
-The local launch was checked again on **2026-10-08**. The distinction below matters: implemented AI features still require real provider settings.
+The broader **2026-10-07** audit also passed 34 Python tests, 10 account/workspace Chromium scenarios, and 12 RAG runtime checks with a controlled local AI provider. Those results retain their original date; the frontend migration did not rerun the Python or RAG suites. See the [verification report](vibe/docs/VERIFICATION.md) for scope and evidence.
+
+The complete local stack was started and its endpoints checked again on **2026-10-12**. Implemented AI features still require real provider settings.
 
 | Capability | Status | Evidence or remaining requirement |
 | --- | --- | --- |
-| Public website and signed-in workspace | Working locally | Astro and Vite start and return HTTP 200 |
+| Public website and signed-in workspace | Working locally | Both Vite applications start and return HTTP 200 |
 | Account registration, sign-in, sessions, and logout | Working | Covered by real browser and backend integration scenarios |
 | Profile editing and avatars | Working with local storage | Upload, reload, replacement, removal, and retry passed in Chromium |
 | User/admin roles and protected routes | Working | Access separation and session revocation after role changes were tested; admin screens require an admin account |
@@ -33,7 +35,7 @@ No external AI or email provider is configured in the current local environment.
 | Layer | Technologies | Responsibility |
 | --- | --- | --- |
 | Languages and runtimes | TypeScript 6, Bun 1.4+, Node.js 22.12+, Python 3.12+ | Web/API development, task orchestration, and the Python service |
-| Public website | Astro 7, React 19, Tailwind CSS 4, React Three Fiber / Three.js | Static public page with React islands and a lazy 3D scene |
+| Public website | React 19, Vite 8, Tailwind CSS 4, React Three Fiber / Three.js | Pre-rendered static React page and a lazy 3D scene |
 | Private workspace | React 19, Vite 8, TanStack Router / Query / Form | Account routes, server state, forms, profile/admin screens, and agent UI |
 | UI primitives | shadcn-style components, Radix / Base UI, Tailwind CSS 4 | Shared controls, layout, and theme; shared CSS is stored locally with its MIT license |
 | Browser API | Bun, Hono 4, Zod, JOSE, Drizzle ORM | Request validation, account/session handling, permissions, storage, and trusted agent proxy |
@@ -50,7 +52,7 @@ AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid pro
 | Directory | Status | Purpose |
 | --- | --- | --- |
 | [vibe](vibe/README.md) | Active application | Application commands, Compose services, shared configuration, and local development guides |
-| [vibe/website](vibe/website/README.md) | Active frontend | Public Astro site |
+| [vibe/website](vibe/website/README.md) | Active frontend | Public React/Vite site |
 | [vibe/webapp](vibe/webapp/README.md) | Active frontend | Registration, sign-in, private workspace, profile/admin pages, and agent UI |
 | [vibe/backend](vibe/backend/README.md) | Active backend | Bun API, authentication, permissions, file storage, scheduler, and agent proxy |
 | [vibe/services/agent](vibe/services/agent/README.md) | Active internal service | Python agent modules, RAG ingestion/retrieval, and conversation state |
@@ -78,7 +80,7 @@ If port `3000` is occupied, set both `PORT=3100` and `VITE_API_URL=http://localh
 bun run dev
 ```
 
-Setup starts PostgreSQL, Chroma, and the Python agent and applies database migrations. Turbo then runs the API, scheduler, Vite app, and Astro site.
+Setup starts PostgreSQL, Chroma, and the Python agent and applies database migrations. Turbo then runs the API, scheduler, Vite app, and React/Vite site.
 
 | Service | Default address |
 | --- | --- |

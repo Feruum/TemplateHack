@@ -193,7 +193,7 @@ function savedPercent(rawBytes, compressedBytes) {
 }
 
 /**
- * Decimal units, because these numbers get compared against the Vite and Astro build summaries
+ * Decimal units, because these numbers get compared against the Vite build summaries
  * printed moments earlier, and both of those are decimal. Reporting 864.5 KB for the file Vite
  * just called 885 kB reads as a discrepancy to chase.
  */

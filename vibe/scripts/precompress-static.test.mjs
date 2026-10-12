@@ -131,7 +131,7 @@ test('precompressDirectory writes siblings for text assets only', async () => {
 })
 
 test('precompressDirectory reaches nested directories, where every real asset lives', async () => {
-  // Vite emits into `assets/` and Astro into `_astro/`, so a walk that stopped at the top level
+  // Vite emits into `assets/`, so a walk that stopped at the top level
   // would leave every hashed bundle uncompressed while still reporting success on `index.html`.
   const directory = await distDirectory({
     'index.html': text,
@@ -152,7 +152,7 @@ test('precompressDirectory reaches nested directories, where every real asset li
 test('precompressDirectory removes a stale sibling whose source is gone', async () => {
   const directory = await distDirectory({
     'app.js': text,
-    // A variant whose source is gone. Vite and Astro empty `dist` themselves, so this arrives the
+    // A variant whose source is gone. Vite empties `dist` itself, so this arrives the
     // other ways: a deploy directory synced without `--delete`, or a run over output the build did
     // not clean. A proxy prefers the sibling whenever it exists, so leaving it serves content
     // whose source the build already dropped.

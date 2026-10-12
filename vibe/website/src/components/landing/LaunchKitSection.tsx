@@ -1,9 +1,8 @@
----
 import { Code2, Gauge, Layers3, Search } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import SectionIntro from './SectionIntro.astro'
+import SectionIntro from './SectionIntro'
 
 const kitItems = [
   {
@@ -34,10 +33,11 @@ const firstSetup = [
   ['Первая функция', 'Описать'],
   ['Публикация', 'Настроить позже'],
 ]
----
 
-<section class="border-b py-20 sm:py-24" id="launch-kit" aria-labelledby="launch-kit-title">
-  <div class="site-container grid items-center gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
+export default function LaunchKitSection() {
+  return (
+<section className="overflow-x-clip border-b py-20 sm:py-24" id="launch-kit" aria-labelledby="launch-kit-title">
+  <div className="site-container grid items-center gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
     <div>
       <div>
         <SectionIntro
@@ -48,42 +48,42 @@ const firstSetup = [
         />
       </div>
 
-      <div class="mt-10 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+      <div className="mt-10 grid gap-x-8 gap-y-7 sm:grid-cols-2">
         {kitItems.map(({ icon: Icon, title, description }) => (
-          <div class="grid grid-cols-[auto_1fr] gap-3">
-            <span class="mt-0.5 grid size-9 place-items-center rounded-lg bg-white/10 text-white">
+          <div key={title} className="grid grid-cols-[auto_1fr] gap-3">
+            <span className="mt-0.5 grid size-9 place-items-center rounded-lg bg-white/10 text-white">
               <Icon className="size-4.5" aria-hidden="true" />
             </span>
             <div>
-              <h3 class="font-heading font-bold">{title}</h3>
-              <p class="mt-1.5 text-sm leading-6 text-muted-foreground">{description}</p>
+              <h3 className="font-heading font-bold">{title}</h3>
+              <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{description}</p>
             </div>
           </div>
         ))}
       </div>
     </div>
 
-    <div class="relative mx-auto w-full max-w-lg">
-      <div class="glow-halo absolute -inset-6 -z-10 rounded-[2.5rem] blur-3xl" aria-hidden="true"></div>
+    <div className="relative mx-auto w-full max-w-lg">
+      <div className="glow-halo absolute -inset-6 -z-10 rounded-[2.5rem] blur-3xl" aria-hidden="true"></div>
       <Card className="glow-surface gap-0 overflow-hidden rounded-2xl bg-[#0d0d0d] py-0 text-white ring-1 ring-white/12">
         <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 px-6 py-5">
           <div>
-            <p class="text-xs text-white/55">Перед первой задачей</p>
-            <p class="mt-1 font-heading text-lg font-bold">Что настроить под себя</p>
+            <p className="text-xs text-white/55">Перед первой задачей</p>
+            <p className="mt-1 font-heading text-lg font-bold">Что настроить под себя</p>
           </div>
           <Badge className="font-bold">4 пункта</Badge>
         </CardHeader>
         <CardContent className="p-6">
-          <ul class="space-y-3">
+          <ul className="space-y-3">
             {firstSetup.map(([label, action], index) => (
-              <li class="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5">
-                <span class="flex items-center gap-3 text-sm">
-                  <span class="grid size-6 place-items-center rounded-full bg-white/10 text-xs text-white/70 tabular-nums">
+              <li key={index} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5">
+                <span className="flex items-center gap-3 text-sm">
+                  <span className="grid size-6 place-items-center rounded-full bg-white/10 text-xs text-white/70 tabular-nums">
                     {index + 1}
                   </span>
                   {label}
                 </span>
-                <span class="text-xs font-bold text-white/60">{action}</span>
+                <span className="text-xs font-bold text-white/60">{action}</span>
               </li>
             ))}
           </ul>
@@ -92,3 +92,5 @@ const firstSetup = [
     </div>
   </div>
 </section>
+  )
+}

@@ -25,7 +25,7 @@ test('the static build keeps the fallback eager, the R3F scene lazy, and story s
   )
   assert.match(storySource, /h-\[34rem\]/)
 
-  const assets = resolve(dist, '_astro')
+  const assets = resolve(dist, 'assets')
   const html = readFileSync(resolve(dist, 'index.html'), 'utf8')
   const scripts = readdirSync(assets)
     .filter((name) => name.endsWith('.js'))
@@ -34,20 +34,23 @@ test('the static build keeps the fallback eager, the R3F scene lazy, and story s
   assert.ok(cssFiles.length > 0, `expected at least one CSS asset in ${assets}`)
   const css = cssFiles.map((name) => readFileSync(resolve(assets, name), 'utf8')).join('\n')
   const canvasChunk = scripts.find(({ source }) => source.includes('data-hero-scene-canvas'))
-  const shellUrl = html.match(
-    /<astro-island[^>]*component-url="([^"]+\.js)"[^>]*>[\s\S]*?data-hero-scene/,
-  )?.[1]
+  const shellUrl = html.match(/<script[^>]*src="([^"]+\.js)"/)?.[1]
 
   assert.match(html, /data-hero-scene-fallback/)
-  assert.match(html, /client="idle"/)
+  assert.match(html, /id="main-content"/)
+  assert.match(html, /id="hero-title"/)
+  assert.match(html, /<title>[^<]+<\/title>/)
+  assert.match(html, /name="description"/)
+  assert.doesNotMatch(html, /astro-island|astro\/|<!--app-html-->/)
   assert.ok(!css.includes('.h-\\[34rem\\]{'))
   assert.ok(canvasChunk, 'expected a separate R3F canvas chunk')
-  assert.ok(shellUrl, 'expected the lightweight HeroScene island chunk')
+  assert.ok(shellUrl, 'expected the React client entrypoint')
   assert.doesNotMatch(html, new RegExp(escapeRegExp(canvasChunk.name)))
 
   const shell = readFileSync(resolve(dist, shellUrl.slice(1)), 'utf8')
   assert.match(shell, new RegExp(escapeRegExp(canvasChunk.name)))
   assert.doesNotMatch(shell, /data-hero-scene-canvas/)
+  assert.match(shell, /requestIdleCallback/)
 })
 
 function escapeRegExp(value: string) {

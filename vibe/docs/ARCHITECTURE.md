@@ -2,6 +2,10 @@
 
 The active project mode is local development. React/Vite serves the pre-rendered public site, the Vite app serves the signed-in workspace, Bun/Hono owns authentication and API access, and FastAPI/LangGraph hosts modular AI agents. `bun run dev` starts the applications and local stores on loopback addresses. Cloud infrastructure, Azure, the Go authorization service, and the mobile app are outside this launch path.
 
+## RAG chat interface libraries
+
+The `/app/assistant` feature composes assistant-ui LocalRuntime/primitives through `AgentThread.tsx`. Its feature-local `runtime.ts` adapter uses the existing authenticated transport and SSE contracts; it does not create another API client, execute browser tools, or use assistant-ui Cloud. TanStack Query retains document/module ownership. Selected Arc Free EmptyState/Badge source lives in `webapp/src/components/arc/`, with scoped aliases to existing theme tokens and its MIT license. See [CHAT_UI.md](CHAT_UI.md) for boundaries, behavior, and maintenance.
+
 ## Components
 
 | Component | Responsibility | Local address |

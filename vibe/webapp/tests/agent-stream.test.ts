@@ -42,3 +42,20 @@ test('preserves a final SSE frame without a trailing blank line', async () => {
 
   expect(events).toEqual([{ type: 'error', data: { error: 'provider down' } }])
 })
+
+test('cancelling an idle stream settles the reader and cancels its source', async () => {
+  const controller = new AbortController()
+  let cancelled = false
+  const response = new Response(new ReadableStream({ cancel() { cancelled = true } }))
+  const pending = readAgentEventStream(response, () => {}, controller.signal)
+  controller.abort(new DOMException('Stopped', 'AbortError'))
+  await expect(pending).rejects.toThrow('Stopped')
+  expect(cancelled).toBe(true)
+})
+
+test('callback failures propagate once without being reinterpreted as JSON errors', async () => {
+  let calls = 0
+  const response = new Response('event: token\ndata: {"content":"hi"}\n\n')
+  await expect(readAgentEventStream(response, () => { calls++; throw new Error('Consumer failed') })).rejects.toThrow('Consumer failed')
+  expect(calls).toBe(1)
+})

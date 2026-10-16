@@ -10,6 +10,14 @@ A local-first starter for hackathon projects. React/Vite serves the pre-rendered
 
 This application is stored under `vibe/` in [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack). Run the commands below from `vibe/`. Git is configured in its parent workspace. The sibling `agentic-rag/` directory is reference source and is not started by these commands.
 
+## RAG chat interface libraries
+
+The existing `/app/assistant` screen uses **assistant-ui 0.15.29** LocalRuntime and primitives for the chat lifecycle. Selected **Arc Free** EmptyState/Badge source and **Motion 14.3.0** provide empty states and status badges. Requests still use the authenticated Bun SSE proxy; provider keys remain server-side. No assistant-ui Cloud account is required.
+
+Local integration checks on 2026-10-16 passed: **86 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, cancellation, and HTTP errors. The UI-only publication candidate passed TypeScript and production build checks.
+
+The [chat UI guide](docs/CHAT_UI.md) explains component ownership, keyboard/cancellation behavior, citations, errors, checks, and remaining AI configuration. Preserve the [Arc MIT license and source record](webapp/src/components/arc/README.md).
+
 ## Datathon data workflow
 
 Use [datathon/](datathon/README.md) for local tabular loading, EDA charts, classification/regression baselines, quality metrics, and optional predictions. It is independent of Docker and AI credentials. With Python 3.12+ installed:

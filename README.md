@@ -4,6 +4,14 @@ A local hackathon application with a public site, account registration, a privat
 
 Repository: [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack).
 
+## RAG chat interface libraries
+
+The signed-in RAG chat uses **assistant-ui 0.15.29** for its runtime, composer, streaming messages, and cancellation. **Arc Free EmptyState and Badge**, with **Motion 14.3.0**, provide empty states and status badges. React/Vite, the authenticated Bun proxy, and the Python/LangGraph backend keep their existing roles. assistant-ui Cloud is not configured.
+
+Local integration checks on 2026-10-16 passed: **86 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, cancellation, and HTTP errors. The UI-only publication candidate passed TypeScript and production build checks.
+
+See [the chat UI guide](vibe/docs/CHAT_UI.md) for architecture, behavior, limits, and checks; [Arc source provenance](vibe/webapp/src/components/arc/README.md) records the MIT license and local theme/icon/Typography adaptations.
+
 ## Datathon preparation
 
 The repository includes a standalone [tabular data workflow](vibe/datathon/README.md): CSV/TSV/JSON loading, EDA charts, classification/regression baselines, holdout evaluation, group/time splits, and optional unlabeled predictions. It runs without Docker or AI keys after installing its isolated Python environment.

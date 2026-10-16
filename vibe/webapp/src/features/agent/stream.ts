@@ -8,35 +8,49 @@ export async function readAgentEventStream(
   onEvent: (event: AgentStreamEvent) => void,
   signal?: AbortSignal,
 ) {
+  for await (const event of iterateAgentEventStream(response, signal)) onEvent(event)
+}
+
+export async function* iterateAgentEventStream(response: Response, signal?: AbortSignal) {
   if (!response.body) throw new Error('The agent returned an empty stream.')
 
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
+  let completed = false
+  const cancel = () => { void reader.cancel(signal?.reason).catch(() => {}) }
+  signal?.addEventListener('abort', cancel, { once: true })
 
   try {
     while (true) {
       signal?.throwIfAborted()
       const { done, value } = await reader.read()
+      signal?.throwIfAborted()
       buffer = (buffer + decoder.decode(value, { stream: !done })).replace(/\r\n/g, '\n')
 
       let separator = buffer.indexOf('\n\n')
       while (separator >= 0) {
-        dispatchFrame(buffer.slice(0, separator), onEvent)
+        const event = parseFrame(buffer.slice(0, separator))
+        if (event) yield event
         buffer = buffer.slice(separator + 2)
         separator = buffer.indexOf('\n\n')
       }
 
-      if (done) break
+      if (done) { completed = true; break }
     }
 
-    if (buffer.trim()) dispatchFrame(buffer, onEvent)
+    if (buffer.trim()) {
+      const event = parseFrame(buffer)
+      if (event) yield event
+    }
   } finally {
+    signal?.removeEventListener('abort', cancel)
+    if (!completed) await reader.cancel().catch(() => {})
     reader.releaseLock()
   }
 }
 
-function dispatchFrame(frame: string, onEvent: (event: AgentStreamEvent) => void) {
+function parseFrame(frame: string): AgentStreamEvent | undefined {
   let type = 'message'
   const data: string[] = []
 
@@ -52,8 +66,8 @@ function dispatchFrame(frame: string, onEvent: (event: AgentStreamEvent) => void
   if (data.length === 0) return
   const payload = data.join('\n')
   try {
-    onEvent({ type, data: JSON.parse(payload) as unknown })
+    return { type, data: JSON.parse(payload) as unknown }
   } catch {
-    onEvent({ type, data: payload })
+    return { type, data: payload }
   }
 }

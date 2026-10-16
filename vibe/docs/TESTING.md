@@ -2,6 +2,10 @@
 
 The active test workflow runs locally. Run these commands from the application directory, `vibe/`. Bun integration tests, Docker smoke, and Playwright use the separate PostgreSQL database `web_app_demo_test`. Do not run them against the development database `web_app_demo`.
 
+## RAG chat interface libraries
+
+Run `bun run --cwd webapp test` for the assistant-ui adapter/SSE regression tests. Run `bun run --cwd webapp e2e agent.spec.ts` for the existing real account/API harness with controlled RAG responses and its isolated test PostgreSQL database. The browser cases cover desktop/mobile chat, sources/tools, module selection, uploads, terminal SSE/HTTP errors, stop, and recovery. They require the installed Chromium runner and do not prove real-provider answer quality. See [CHAT_UI.md](CHAT_UI.md) for ownership and reproduction details.
+
 ## Fast checks
 
 ```powershell

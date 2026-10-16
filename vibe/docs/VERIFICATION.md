@@ -188,3 +188,28 @@ Docker Desktop and the normal `bun run dev` stack were started as hidden process
 | `http://localhost:3100/api/agent/modules` without a session | HTTP 401 |
 
 The site needed warm-up on its first request; subsequent requests succeeded. Real LLM/embedding settings remain absent, and mail remains disabled. The datathon CLI does not require these providers or the running web stack. The existing lazy 3D chunk size warning remains non-fatal.
+
+## assistant-ui and Arc Free — 2026-10-16
+
+Scope: the existing signed-in RAG chat and selected Arc Free components. The user explicitly requested publication of UI changes only. Separate RAG/memory/consolidation changes were present and continued in the working tree; they remain unpublished by this commit. Shared Markdown and AgentWorkspace changes were staged selectively, preserving the other work.
+
+assistant-ui 0.15.29 LocalRuntime replaces the handwritten chat/composer lifecycle. A feature-local adapter retains the authenticated SSE proxy, stable server thread ID, selected module, text, source citations, and server tool statuses. Arc Free EmptyState/Badge source, motion tokens, and the MIT license are checked in with scoped theme aliases, Hugeicons, and Typography. Motion 14.3.0 is pinned. assistant-ui Cloud is not configured.
+
+| Local check | Observed result |
+| --- | --- |
+| Full working-tree bun run check | Passed, exit code 0: template validation, architecture, Bun audit, types, lint, suites, and builds |
+| Working-tree Bun suites | 561 passed, 0 failed, across 87 files; includes 3 tests from the separate unpublished RAG work |
+| Webapp suite | 86 passed, 0 failed; includes 9 model-adapter tests and 4 SSE tests |
+| Build contracts | 2 passed; all four workspace builds completed with local cache reuse |
+| UI-only publication TypeScript | Passed against 196 indexed webapp source files, with unpublished MemoryCard excluded |
+| UI-only publication production build | Passed using indexed AgentWorkspace, agent API, and contracts; unpublished memory dependencies excluded |
+| Chromium RAG UI scenarios | 4 passed: 1440px desktop, 390px mobile/reduced-motion/dark theme, SSE error/stop/recovery, and HTTP 503 error message |
+| Review | Two lifecycle/error findings reproduced and fixed; focused follow-up found no remaining significant issues |
+
+The full Bun total comprises 127 script tests, 21 contracts, 298 backend unit tests, 20 backend integration tests, 86 webapp tests, and 9 website tests. It describes the working tree during the check, not a claim that unpublished RAG work is part of this UI release. Published UI-specific TypeScript, production, and browser checks read the actual indexed candidate for the shared files.
+
+Browser scenarios used the existing real account/API harness and isolated test PostgreSQL database. RAG responses were controlled at the browser network boundary; requests still carried the real test access token. Tests verified automatic/explicit module selection, stable server thread identity, citations/page/snippet retention, server tool status, unsupported upload rejection, valid TXT upload UI, stop, and sending after failure. They also reproduced the structured HTTP 503 error before its fix. These scenarios do not test real-provider answer quality, real document indexing, or retrieval. Earlier agent/RAG evidence remains dated separately above. Development volumes were preserved; the harness removed only its test database.
+
+Regression checks also prove incremental text, legacy event compatibility, bounded/filtered history, source deduplication, callback error propagation, cancellation of an idle reader, missing-end interruption, and recovery after an individual server tool fails. Individual tool failures no longer terminate a recoverable server run. Structured AssistantError messages remain actionable in the UI.
+
+Production build warning: the existing shared vendor grouping produces a roughly 942 kB minified webapp vendor chunk (286 kB gzip) with these libraries. The build succeeds; loading performance on slow devices/networks was not benchmarked. Motion emits its expected development warning when reduced motion is enabled. Real LLM/embedding configuration is still required for AI answers and indexing; UI dependency installation does not supply credentials. No cloud deployment or cloud checks were performed.

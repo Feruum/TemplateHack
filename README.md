@@ -4,11 +4,13 @@ A local hackathon application with a public site, account registration, a privat
 
 Repository: [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack).
 
+Interface conventions and library responsibilities are recorded in [design.md](vibe/design.md).
+
 ## RAG chat interface libraries
 
 The signed-in RAG chat uses **assistant-ui 0.15.29** for its runtime, composer, streaming messages, and cancellation. **Arc Free EmptyState and Badge**, with **Motion 14.3.0**, provide empty states and status badges. React/Vite, the authenticated Bun proxy, and the Python/LangGraph backend keep their existing roles. assistant-ui Cloud is not configured.
 
-Local integration checks on 2026-10-16 passed: **86 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, cancellation, and HTTP errors. The UI-only publication candidate passed TypeScript and production build checks.
+Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Type checks and production builds passed. Private agent caches clear on sign-out and account replacement.
 
 See [the chat UI guide](vibe/docs/CHAT_UI.md) for architecture, behavior, limits, and checks; [Arc source provenance](vibe/webapp/src/components/arc/README.md) records the MIT license and local theme/icon/Typography adaptations.
 
@@ -28,7 +30,9 @@ Demo creates explicitly synthetic reports under ignored `.artifacts/datathon-dem
 
 ## What works and what still needs configuration
 
-The active application is `vibe/`. The datathon preparation check on **2026-10-16** passed **24 datathon Python tests, 547 Bun tests, and 2 build-contract tests**, type checks, lint, workspace builds, and the Bun dependency audit. Both synthetic data tasks completed and produced HTML reports, measured model comparisons, and reproducibility artifacts.
+The RAG implementation is consolidated inside `vibe/services/agent`. It includes owner-filtered dense/keyword search and explicit private memory notes, with controls in the React workspace. The outer `agentic-rag/` reference directory has been retired. See the [source reconciliation and operating guide](vibe/docs/RAG_CONSOLIDATION.md); an already-running older agent image must be rebuilt to load these changes.
+
+The active application is `vibe/`. The combined RAG/interface check on **2026-10-16** passed **566 Bun tests and 2 build-contract tests**, types, lint, workspace builds, architecture validation, and the dependency audit. The agent passed **43 Python tests** with one PostgreSQL-only case skipped in that run; the separate PostgreSQL suite passed **5 tests**, including that concurrency case. Four Chromium scenarios passed against the combined frontend. The earlier datathon check passed **24 Python tests**, and both synthetic tasks produced reports and reproducibility artifacts. See [dated verification evidence](vibe/docs/VERIFICATION.md) for test boundaries and remaining provider requirements.
 
 The React/Vite migration check on **2026-10-12** also verified the website Storybook build and public-site browser behavior: desktop/mobile navigation, FAQ controls, hydration, and static fallback with JavaScript blocked, reduced motion, and WebGL disabled. Those browser scenarios were not rerun for the standalone data workflow.
 
@@ -51,7 +55,8 @@ The complete local stack was started and its endpoints checked again on **2026-1
 | Cloud storage and deployment | Available source; not deployed or verified against real cloud accounts | The normal launch uses local filesystem storage and Docker volumes |
 | Browser payments and checkout | Not implemented in the active application | Recorded as absent in the capability registry |
 | Mobile app | Inactive | Only its guide is present on this launch path; it is not started or checked here |
-| Original Go auth service / Next.js dashboard | Reference source | Kept under `agentic-rag/`; not started or audited as the active product |
+| Private agent memory | Implemented and locally tested | Explicit note creation/deletion, PostgreSQL persistence, trusted-owner retrieval, and cross-user isolation; the agent has read-only memory tools |
+| Original Go auth service / Next.js dashboard | Retired | Replaced by the existing Bun/React application; original source remains in Git history |
 
 No external AI or email provider is configured in the current local environment. Account features work independently of those integrations. A healthy agent process does not mean that real AI indexing and answers are ready.
 
@@ -63,15 +68,16 @@ No external AI or email provider is configured in the current local environment.
 | Public website | React 19, Vite 8, Tailwind CSS 4, React Three Fiber / Three.js | Pre-rendered static React page and a lazy 3D scene |
 | Private workspace | React 19, Vite 8, TanStack Router / Query / Form | Account routes, server state, forms, profile/admin screens, and agent UI |
 | UI primitives | shadcn-style components, Radix / Base UI, Tailwind CSS 4 | Shared controls, layout, and theme; shared CSS is stored locally with its MIT license |
+| Chat and status UI | assistant-ui 0.15.29, Arc Free EmptyState/Badge, Motion 14.3.0, Hugeicons | Chat lifecycle, streaming, cancellation, empty states, and status badges; see [design.md](vibe/design.md) |
 | Browser API | Bun, Hono 4, Zod, JOSE, Drizzle ORM | Request validation, account/session handling, permissions, storage, and trusted agent proxy |
 | Relational storage | PostgreSQL 18, Drizzle migrations, SQLAlchemy, asyncpg / psycopg | Account data, document metadata, thread ownership, and conversation checkpoints |
-| AI and retrieval | FastAPI, Uvicorn, LangChain, LangGraph, Chroma, pypdf | PDF/TXT processing, vector retrieval, agent orchestration, and streaming |
+| AI and retrieval | FastAPI, Uvicorn, LangChain, LangGraph, Chroma, pypdf | PDF/TXT processing, owner-filtered dense/BM25L retrieval with rank fusion, private memory, orchestration, and streaming |
 | Background work | Croner and the PostgreSQL task outbox | Scheduled job execution and retryable queued work |
 | Local infrastructure | Docker Compose, uv / `uv.lock`, Bun workspaces, Turborepo | Local services, locked dependencies, ordered tasks, and local build caching |
 | Checks and tooling | Bun test, pytest, Playwright / Chromium, ESLint, TypeScript, Storybook | Automated checks and optional component catalogs |
 | Datathon analysis | pandas, NumPy, scikit-learn, SciPy, matplotlib | Isolated EDA, dummy/linear baselines, holdouts, and reproducible reports |
 
-AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid provider is automatically selected or provisioned. Go, ConnectRPC, Kratos, SpiceDB, and Next.js belong to the reference project, not the active local runtime.
+AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid provider is automatically selected or provisioned. The original Go, Kratos, SpiceDB, and Next.js applications were retired during [RAG consolidation](vibe/docs/RAG_CONSOLIDATION.md).
 
 ## Workspace
 
@@ -85,9 +91,8 @@ AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid pro
 | [vibe/packages/contracts](vibe/packages/contracts/README.md) | Shared package | Zod contracts and TypeScript types used by the API and workspace |
 | [vibe/datathon](vibe/datathon/README.md) | Local data workflow | EDA, classification/regression baselines, quality evaluation, and synthetic verification |
 | [vibe/infra](vibe/infra/README.md) | Optional deployment source | Infrastructure definitions and release helpers; outside the verified local launch |
-| [agentic-rag](agentic-rag/README.md) | Reference source | Original standalone RAG monorepo; its Go auth service and Next.js dashboard are outside the active launch path |
 
-Run the application commands from `vibe/`. Git is configured at the parent workspace root, so both source directories belong to the same repository.
+Run the application commands from `vibe/`. Git is configured at the parent workspace root. The Python agent is part of the same application and repository.
 
 ## Quick start on Windows
 
@@ -115,6 +120,8 @@ Setup starts PostgreSQL, Chroma, and the Python agent and applies database migra
 | Signed-in workspace | `http://localhost:5173` |
 | Bun API | `http://localhost:3000` (`3100` in the local audit configuration) |
 | Internal Python agent | `http://localhost:8001` |
+
+Open the [public site](http://localhost:4321/), [registration](http://localhost:5173/signup), or [RAG workspace](http://localhost:5173/app/assistant) on the computer running the stack. The RAG workspace requires an account. These are local development addresses, not a hosted deployment.
 
 The current local environment uses API port `3100` and PostgreSQL port `25432`; these machine-specific settings are in the ignored `vibe/.env`. A new environment copied from `.env.example` uses the defaults. Keep `PORT` aligned with `VITE_API_URL`, and `POSTGRES_PORT` aligned with `DATABASE_URL`. If Windows reserves the default database port, choose another free port as described in the [local database guide](vibe/docs/LOCAL_DATABASE.md).
 
@@ -162,4 +169,4 @@ The project is published on `main` in `https://github.com/Feruum/TemplateHack.gi
 
 Start with the [application README](vibe/README.md), [architecture](vibe/docs/ARCHITECTURE.md), and [local database guide](vibe/docs/LOCAL_DATABASE.md). Active product decisions are recorded in [CHECKLIST.md](vibe/CHECKLIST.md).
 
-The Vibe-derived application uses Apache License 2.0. Preserve [LICENSE](vibe/LICENSE), [NOTICE](vibe/NOTICE), and the original attribution when distributing it. Reference source retains its own files and notices.
+The Vibe-derived application uses Apache License 2.0. Preserve [LICENSE](vibe/LICENSE), [NOTICE](vibe/NOTICE), and the original attribution when distributing it. The [consolidation guide](vibe/docs/RAG_CONSOLIDATION.md) records the original agent source and its recovery from Git history.

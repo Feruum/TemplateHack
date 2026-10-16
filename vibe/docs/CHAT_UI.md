@@ -15,7 +15,7 @@ The signed-in `/app/assistant` screen uses React 19 and Vite. `@assistant-ui/rea
 
 The browser still sends `POST /api/agent/chat/stream` through `useAuth().transport`. The adapter supplies a stable server `thread_id`, the selected module when explicit, and at most 49 nonempty text messages. API contracts validate the payload. Provider credentials stay on the server. assistant-ui Cloud is not configured; no Cloud account or Cloud API key is needed.
 
-LocalRuntime replaces the handwritten chat/composer state. It is the sole owner of that client lifecycle. TanStack Query remains the owner of module/document queries and upload mutations. The existing shared cards, buttons, selects, alerts, and Typography remain in use.
+LocalRuntime replaces the handwritten chat/composer state. It is the sole owner of that client lifecycle. TanStack Query owns module/document/memory queries and upload/note mutations. Agent query keys include the account ID under the shared session namespace; logout and replacement login remove private cache and cancel pending reads. The workspace remounts when the account changes to reset local conversation and drafts. The existing shared cards, buttons, selects, alerts, and Typography remain in use. See the [design guide](../design.md) for library responsibilities and visual conventions.
 
 ## Behavior and limits
 
@@ -47,6 +47,6 @@ bun run --cwd webapp build
 bun run --cwd webapp e2e agent.spec.ts
 ```
 
-The browser suite uses the normal real account/API harness and its separate `web_app_demo_test` PostgreSQL database. RAG endpoint responses are controlled at the browser network boundary, so it verifies client wiring, authenticated requests, source/tool rendering, errors, cancellation, module selection, and upload UI without an external model. It does not prove real embeddings, extraction, retrieval, or model quality. Existing backend and agent tests own those service boundaries. See [TESTING.md](TESTING.md) for database safety and [VERIFICATION.md](VERIFICATION.md) for dated observed results.
+The browser suite uses the normal real account/API harness and its separate `web_app_demo_test` PostgreSQL database. RAG endpoint responses are controlled at the browser network boundary, so it verifies client wiring, authenticated requests, source/tool rendering, errors, cancellation, module selection, uploads, and explicit note save/reload/delete without an external model. It does not prove real embeddings, extraction, retrieval, or model quality. Existing backend and agent tests own those service boundaries. See [TESTING.md](TESTING.md) for database safety and [VERIFICATION.md](VERIFICATION.md) for dated observed results.
 
 Primary references: [assistant-ui runtimes](https://www.assistant-ui.com/docs/runtimes/pick-a-runtime), [Arc introduction](https://uiarc.dev/docs/introduction), and [Arc licensing](https://uiarc.dev/license).

@@ -68,3 +68,22 @@ export type AgentModule = z.infer<typeof agentModuleSchema>
 export type AgentDocument = z.infer<typeof agentDocumentSchema>
 export type AgentDocumentStatus = z.infer<typeof agentDocumentStatusSchema>
 export type AgentChatRequest = z.infer<typeof agentChatRequestSchema>
+
+export const AGENT_MEMORY_MAX_LENGTH = 2000
+
+export const agentMemoryInputSchema = z.object({
+  content: z.string().trim().min(1).max(AGENT_MEMORY_MAX_LENGTH),
+}).strict()
+
+export const agentMemorySchema = z.object({
+  id: z.uuid(),
+  content: z.string().min(1).max(AGENT_MEMORY_MAX_LENGTH),
+  created_at: z.string().datetime({ offset: true }),
+}).strict()
+
+export const agentMemoriesResponseSchema = z.object({
+  memories: z.array(agentMemorySchema).max(1000),
+}).strict()
+
+export const agentMemoryDeletedSchema = z.object({ deleted: z.literal(true) }).strict()
+export type AgentMemory = z.infer<typeof agentMemorySchema>

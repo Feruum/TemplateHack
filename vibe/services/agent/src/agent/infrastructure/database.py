@@ -108,6 +108,7 @@ async def initialize_database() -> None:
     """Create local service tables on first launch of the empty starter database."""
     # Import registers the ownership model in shared SQLAlchemy metadata.
     from agent.infrastructure.thread_ownership import ThreadOwnership  # noqa: F401
+    from agent.memory.notes import MemoryNote  # noqa: F401
 
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)

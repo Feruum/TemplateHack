@@ -60,7 +60,7 @@ Follow the existing context boundaries: `transport` handles HTTP, `application` 
 
 Drizzle owns the Bun app schema. The table definitions are in `backend/src/db-schema.ts`; reviewed SQL migrations are in `backend/drizzle/`. Change the schema, generate a migration with `bun run --cwd backend db:generate`, review the SQL, and apply it with `bun run --cwd backend db:migrate`. Use PostgreSQL enums only for closed value sets. PostgreSQL 18 provides the UUIDv7 default used by this schema.
 
-The Python service uses a separate `agent` database on the same local PostgreSQL server. SQLAlchemy owns document metadata and LangGraph checkpoints. FastAPI creates missing tables from SQLAlchemy metadata on startup. Vectors live in Chroma; uploaded files live in the agent's local volume. Do not mix these tables into the Drizzle schema for the web app.
+The Python service uses a separate `agent` database on the same local PostgreSQL server. SQLAlchemy owns document metadata, explicit personal notes, and LangGraph checkpoints. FastAPI creates missing tables from SQLAlchemy metadata on startup. Vectors live in Chroma; uploaded files live in the agent's local volume. Do not mix these tables into the Drizzle schema for the web app.
 
 ## Agent modules
 
@@ -68,7 +68,9 @@ The shared orchestrator builds the LangGraph workflow and selects a module throu
 
 An `AgentModule` definition owns its instructions, tools, and routing keywords. Add modules under `services/agent/src/agent/modules/` and register each one in `get_modules()`. A tool must not decide which user owns its data: the backend-trusted `user_id` is injected by the orchestrator. Return structured tool status and sources so the API can stream them over SSE.
 
-The first module, `rag`, accepts PDF and TXT files. It stores files in the agent's local storage, metadata and progress in the `agent` database, and embeddings/chunks in local Chroma. Search filters by user ID. Docker volumes preserve this data across local restarts.
+The first module, `rag`, accepts PDF and TXT files. It stores files in the agent's local storage, metadata and progress in the `agent` database, and embeddings/chunks in local Chroma. Dense and BM25 keyword retrieval use the same owner filter and merge through reciprocal rank fusion. Docker volumes preserve this data across local restarts.
+
+Personal notes use authenticated `/api/agent/memories` list/create/delete routes through Bun. Only explicit user actions write memory; the agent's `search_user_memory` tool is read-only and receives its owner from graph state. Notes are context/preferences and do not become document citation sources. See [RAG_CONSOLIDATION.md](RAG_CONSOLIDATION.md) for limits, source disposition, and image update instructions.
 
 ## LLM settings and privacy
 
@@ -86,7 +88,7 @@ Bun stores retryable one-off work in a PostgreSQL outbox and defines scheduled j
 
 See [TESTING.md](TESTING.md) for local check commands and [LOCAL_DATABASE.md](LOCAL_DATABASE.md) for database connections and data reset. Bun commands are listed in [COMMANDS.md](COMMANDS.md).
 
-The repository may still contain Terraform, cloud email/storage adapters, Azure Search, and Go code. They are not part of the active local launch, Compose stack, authentication flow, or quick-start guide. Do not enable them in local configuration without a separate request and an updated deployment plan.
+The repository still contains Terraform, cloud email/storage adapters, and inactive Azure Search source. They are not part of the active local launch, Compose stack, authentication flow, or quick-start guide. The original separate Go/Next.js application was retired. Do not enable cloud integrations in local configuration without a separate request and an updated deployment plan.
 
 ## Official documentation
 

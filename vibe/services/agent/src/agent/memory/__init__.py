@@ -1,1 +1,3 @@
-from .mem0_client import AgentMemory as AgentMemory
+from .notes import MemoryNote, MemoryNotes
+
+__all__ = ['MemoryNote', 'MemoryNotes']

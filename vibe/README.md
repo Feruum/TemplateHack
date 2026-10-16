@@ -8,15 +8,17 @@ A local-first starter for hackathon projects. React/Vite serves the pre-rendered
 
 [AGENTS.md](AGENTS.md) defines the development rules. The active launch path is local. Cloud infrastructure and the mobile branch are not part of this starter's first run.
 
-This application is stored under `vibe/` in [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack). Run the commands below from `vibe/`. Git is configured in its parent workspace. The sibling `agentic-rag/` directory is reference source and is not started by these commands.
+This application is stored under `vibe/` in [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack). Run the commands below from `vibe/`. Git is configured in its parent workspace. The canonical RAG agent lives in `services/agent`; the outer original reference directory has been retired. See [RAG consolidation](docs/RAG_CONSOLIDATION.md) for source reconciliation and recovery from Git history.
+
+The agent combines owner-filtered vector and keyword retrieval, optional reranking, streaming citations, and PostgreSQL conversation state. The workspace's **Your memory** card lets each user save/delete private preferences. The model can read those notes but cannot write or delete them. Existing running agent containers need a rebuild to load the new Python routes; the [guide](docs/RAG_CONSOLIDATION.md#run-and-verify) explains it.
 
 ## RAG chat interface libraries
 
 The existing `/app/assistant` screen uses **assistant-ui 0.15.29** LocalRuntime and primitives for the chat lifecycle. Selected **Arc Free** EmptyState/Badge source and **Motion 14.3.0** provide empty states and status badges. Requests still use the authenticated Bun SSE proxy; provider keys remain server-side. No assistant-ui Cloud account is required.
 
-Local integration checks on 2026-10-16 passed: **86 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, cancellation, and HTTP errors. The UI-only publication candidate passed TypeScript and production build checks.
+Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Session-scoped agent caches clear on sign-out and account replacement.
 
-The [chat UI guide](docs/CHAT_UI.md) explains component ownership, keyboard/cancellation behavior, citations, errors, checks, and remaining AI configuration. Preserve the [Arc MIT license and source record](webapp/src/components/arc/README.md).
+The [design guide](design.md) records the frontend libraries and visual conventions. The [chat UI guide](docs/CHAT_UI.md) explains component ownership, keyboard/cancellation behavior, citations, errors, checks, and remaining AI configuration. Preserve the [Arc MIT license and source record](webapp/src/components/arc/README.md).
 
 ## Datathon data workflow
 

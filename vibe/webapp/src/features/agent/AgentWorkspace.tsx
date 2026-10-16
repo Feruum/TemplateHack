@@ -9,21 +9,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Typography } from '@/components/typography'
 import { useAuth } from '@/features/auth'
-import { getAgentDocuments, getAgentModules, isSupportedDocument, uploadAgentDocument } from './api'
+import { isSupportedDocument, uploadAgentDocument } from './api'
 import { AgentThread } from './AgentThread'
+import { MemoryCard } from './MemoryCard'
+import { agentDocumentsQueryOptions, agentModulesQueryOptions, agentQueryKeys } from './queries'
 
 const pendingDocumentStatuses = new Set(['PENDING', 'QUEUED', 'PROCESSING'])
 
 export function AgentWorkspace() {
-  const { transport } = useAuth()
+  const { user } = useAuth()
+  return <AuthenticatedAgentWorkspace key={user?.id} />
+}
+
+function AuthenticatedAgentWorkspace() {
+  const { transport, user } = useAuth()
   const queryClient = useQueryClient()
   const [selectedModuleId, setSelectedModuleId] = useState('auto')
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [uploadNotice, setUploadNotice] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const moduleQuery = useQuery({ queryKey: ['agent', 'modules'], queryFn: () => getAgentModules(transport) })
+  const moduleQuery = useQuery(agentModulesQueryOptions(transport, user?.id))
   const documentQuery = useQuery({
-    queryKey: ['agent', 'documents'], queryFn: () => getAgentDocuments(transport),
+    ...agentDocumentsQueryOptions(transport, user?.id),
     refetchInterval: (query) => query.state.data?.documents.some((document) => pendingDocumentStatuses.has(document.status)) ? 1500 : false,
   })
   const uploadMutation = useMutation({
@@ -31,7 +38,7 @@ export function AgentWorkspace() {
     onSuccess: async (document) => {
       setUploadError(null)
       setUploadNotice(`“${document.filename}” is queued for indexing.`)
-      await queryClient.invalidateQueries({ queryKey: ['agent', 'documents'] })
+      await queryClient.invalidateQueries({ queryKey: agentQueryKeys.documents(user?.id) })
     },
     onError: (error: unknown) => {
       setUploadNotice(null)
@@ -72,6 +79,7 @@ export function AgentWorkspace() {
           </CardContent>
         </Card>
         <aside className="grid min-w-0 content-start gap-5">
+          <MemoryCard />
           <Card>
             <CardHeader><CardTitle>Knowledge base</CardTitle><CardDescription>Only PDF and TXT files. Maximum size: 25 MiB.</CardDescription></CardHeader>
             <CardContent className="grid gap-3">

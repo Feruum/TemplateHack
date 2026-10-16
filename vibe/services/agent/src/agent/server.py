@@ -17,7 +17,7 @@ from agent.infrastructure.ingestion import resume_ingestion_jobs
 from agent.infrastructure.stream_admission import create_stream_admission_controller
 from agent.infrastructure.thread_ownership import ThreadOwnership  # noqa: F401
 from agent.modules.registry import get_modules
-from agent.routes import admin, agent, health
+from agent.routes import admin, agent, health, memory
 from agent.server_auth import get_current_user
 from agent.utils.logging import configure_logging
 from agent.utils.observability import (
@@ -122,6 +122,7 @@ async def add_headers_middleware(request: Request, call_next):
 app.include_router(health.router)
 app.include_router(agent.router, dependencies=[Depends(get_current_user)])
 app.include_router(admin.router, dependencies=[Depends(get_current_user)])
+app.include_router(memory.router, dependencies=[Depends(get_current_user)])
 
 
 @app.get("/health")

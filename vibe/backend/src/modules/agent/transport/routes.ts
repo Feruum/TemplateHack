@@ -1,6 +1,7 @@
 import {
   AGENT_DOCUMENT_MAX_BYTES,
   agentChatRequestSchema,
+  agentMemoryInputSchema,
 } from '@web-app-demo/contracts'
 import { Hono } from 'hono'
 import type { MiddlewareHandler } from 'hono'
@@ -26,6 +27,23 @@ export function createAgentRoutes(options: {
   routes.get('/modules', async (c) => {
     const response = await proxy('/api/v1/modules', undefined, c.var.user.id)
     return relayJson(response)
+  })
+
+  routes.get('/memories', async (c) => {
+    return relayJson(await proxy('/api/v1/memories', undefined, c.var.user.id))
+  })
+
+  routes.post('/memories', bodyLimit({ maxSize: 16 * 1024 }), async (c) => {
+    const input = agentMemoryInputSchema.parse(await c.req.json())
+    return relayJson(await proxy('/api/v1/memories', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(input),
+    }, c.var.user.id))
+  })
+
+  routes.delete('/memories/:memoryId', async (c) => {
+    return relayJson(await proxy(`/api/v1/memories/${encodeURIComponent(c.req.param('memoryId'))}`, { method: 'DELETE' }, c.var.user.id))
   })
 
   routes.get('/documents', async (c) => {

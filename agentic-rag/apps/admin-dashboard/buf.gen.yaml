@@ -1,8 +1,0 @@
-version: v1
-plugins:
-  - plugin: buf.build/connectrpc/es:v1.6.1
-    out: src/gen
-    opt: target=ts
-  - plugin: buf.build/bufbuild/es:v2.10.2
-    out: src/gen
-    opt: target=ts

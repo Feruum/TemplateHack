@@ -1,6 +1,6 @@
 """Configuration for the local, Bun-proxied agent service."""
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     embedding_dimensions: int = 1024
 
     use_reranker: bool = False
+    use_hybrid_search: bool = True
+    retrieval_lexical_max_chunks: int = Field(default=2000, ge=1, le=10000)
     rerank_base_url: str = ""
     rerank_api_key: str = ""
     rerank_model: str = "reranker"

@@ -29,7 +29,7 @@ def test_workflow_binds_only_selected_module_tools():
 
     args, kwargs = llm.bind_tools.call_args
     tools = args[0]
-    assert [item.name for item in tools] == ["search_user_documents"]
+    assert [item.name for item in tools] == ["search_user_documents", "search_user_memory"]
     assert kwargs == {"tool_choice": "auto"}
 
 

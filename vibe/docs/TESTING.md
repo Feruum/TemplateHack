@@ -4,7 +4,7 @@ The active test workflow runs locally. Run these commands from the application d
 
 ## RAG chat interface libraries
 
-Run `bun run --cwd webapp test` for the assistant-ui adapter/SSE regression tests. Run `bun run --cwd webapp e2e agent.spec.ts` for the existing real account/API harness with controlled RAG responses and its isolated test PostgreSQL database. The browser cases cover desktop/mobile chat, sources/tools, module selection, uploads, terminal SSE/HTTP errors, stop, and recovery. They require the installed Chromium runner and do not prove real-provider answer quality. See [CHAT_UI.md](CHAT_UI.md) for ownership and reproduction details.
+Run `bun run --cwd webapp test` for the assistant-ui adapter/SSE and agent-session cache regression tests. Cache tests cover sign-out, replacement login, cross-account reads, and cancellation. Run `bun run --cwd webapp e2e agent.spec.ts` for the existing real account/API harness with controlled RAG responses and its isolated test PostgreSQL database. The browser cases cover desktop/mobile chat, sources/tools, module selection, uploads, note save/reload/delete, terminal SSE/HTTP errors, stop, and recovery. They require the installed Chromium runner and do not prove real-provider answer quality. See [CHAT_UI.md](CHAT_UI.md) for ownership and reproduction details.
 
 ## Fast checks
 
@@ -63,7 +63,7 @@ uv run pytest
 Pop-Location
 ```
 
-Unit tests cover the module registry, module selection, internal authentication, streaming, SQLAlchemy checkpoint persistence, and user-scoped document access. They do not replace a run with a real LLM and Chroma service.
+Tests cover the module registry, module selection, internal authentication, streaming, SQLAlchemy checkpoint persistence, user-scoped document access, and explicit memory notes. Hybrid retrieval tests use real ephemeral Chroma with controlled embeddings to exercise keywords, owner filtering, deduplication, and deletion. Memory HTTP tests use an isolated database; `TEST_AGENT_DATABASE_URL` can select a fresh PostgreSQL test database for persistence and concurrent quota checks. These tests do not replace generated-answer evaluation with a real model. See [RAG_CONSOLIDATION.md](RAG_CONSOLIDATION.md).
 
 ## RAG workflow
 

@@ -143,6 +143,8 @@
 
 ## 10. Реестр возможностей
 
+Консолидация RAG от 2026-10-16 одобрена пользователем: одна рабочая реализация в `services/agent`, гибридный поиск и явные приватные заметки. Внешний `agentic-rag/` удалён после сверки; исходник доступен в истории Git. Второй фронт, Go-auth и облачные интеграции не запускаются. Решения и ограничения — в `docs/RAG_CONSOLIDATION.md`.
+
 Обновляй реестр при добавлении или удалении возможности. Допустимо одно состояние:
 
 - `included` — реализовано и должно работать.
@@ -156,6 +158,9 @@
 | --- | --- | --- |
 | assistant-ui and Arc Free chat UI | included | По запросу пользователя: assistant-ui 0.15.29 LocalRuntime для существующего RAG-чата, Arc Free EmptyState/Badge под MIT и Motion 14.3.0. Сохраняются защищённый SSE proxy, модули, PDF/TXT, источники и серверные tools. Cloud не подключён. См. `docs/CHAT_UI.md`. |
 | Auth (email + password) | included | Базовая возможность шаблона. |
+| Agent document Q&A | included | FastAPI/LangGraph в `services/agent`: личные PDF/TXT, Chroma, потоковые ответы с источниками и PostgreSQL checkpoints. Реальные ответы требуют chat/embedding-провайдера. |
+| Agent hybrid retrieval | included | Поиск по векторам и Unicode-ключевым словам через BM25L/RRF. Оба пути фильтруются по владельцу. При превышении лимита корпуса выполняется dense-only поиск. См. `docs/RAG_CONSOLIDATION.md`. |
+| Agent personal memory | included | Только явно сохранённые пользователем заметки; React UI, Bun proxy, PostgreSQL и проверка владельца. Модель получает инструмент только для чтения. До 100 заметок; нет автоматического копирования чатов/документов в память. |
 | Datathon tabular workflow | included | `datathon/`: CSV/TSV/JSON/JSONL, EDA с графиками, dummy/linear baseline классификации и регрессии, метрики holdout, group/time split, train-only preprocessing, HTML/JSON-отчёт, синтетическое демо и опциональный submission. Данные/результаты игнорируются Git. Не требует Docker/LLM. См. `datathon/README.md`. |
 | Turborepo task orchestration | included | По запросу пользователя: `bun run dev` один раз запускает Compose и миграции, затем параллельно Bun API/scheduler, два React/Vite-приложения. Сборки и проверки типов учитывают зависимости Bun workspaces; кеш локальный в `.turbo`, удалённый кеш отключён. Dev, setup и проверки собранных файлов не кешируются. Команды — в `docs/COMMANDS.md`. |
 | Admin roles | included | Роли и seed в `backend`, интерфейс администратора в `webapp`. |

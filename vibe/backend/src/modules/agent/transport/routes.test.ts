@@ -36,6 +36,26 @@ function createTestApp(fetchAgent: typeof fetch = fetch) {
   return app
 }
 
+test('memory proxy requires a session and forwards only explicit writes with trusted identity', async () => {
+  const calls: Array<{ url: string; init?: RequestInit }> = []
+  const app = createTestApp(async (url, init) => {
+    calls.push({ url: String(url), init })
+    return Response.json({ memories: [] })
+  })
+  expect((await app.request('/api/agent/memories')).status).toBe(401)
+  expect(calls).toHaveLength(0)
+  const headers = { Authorization: 'Bearer valid-session-token', 'Content-Type': 'application/json', 'X-User-ID': 'forged-user' }
+  expect((await app.request('/api/agent/memories', { headers })).status).toBe(200)
+  expect((await app.request('/api/agent/memories', { method: 'POST', headers, body: JSON.stringify({ content: 'private', user_id: 'forged-user' }) })).status).toBe(400)
+  expect(calls).toHaveLength(1)
+  expect((await app.request('/api/agent/memories', { method: 'POST', headers, body: JSON.stringify({ content: '  Prefer Russian.  ' }) })).status).toBe(200)
+  expect(calls[1]!.url).toBe('http://127.0.0.1:8001/api/v1/memories')
+  expect(JSON.parse(String(calls[1]!.init?.body))).toEqual({ content: 'Prefer Russian.' })
+  expect(new Headers(calls[1]!.init?.headers).get('X-User-ID')).toBe(user.id)
+  expect((await app.request('/api/agent/memories/0196f6f8-6600-7000-8000-000000000001', { method: 'DELETE', headers })).status).toBe(200)
+  expect(calls[2]!.init?.method).toBe('DELETE')
+})
+
 test('chat proxy requires a session and forwards only the verified user identity', async () => {
   const calls: Array<{ url: RequestInfo | URL; init?: RequestInit }> = []
   const app = createTestApp(async (url, init) => {

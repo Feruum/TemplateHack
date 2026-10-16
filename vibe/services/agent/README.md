@@ -24,6 +24,8 @@ The following env values come from the root `.env.example` and `docker-compose.y
 | `AGENT_EMBEDDING_API_KEY` | Optional embedding API credential; defaults to chat key |
 | `AGENT_EMBEDDING_MODEL` | Embedding model name used when indexing/searching |
 | `AGENT_USE_RERANKER` | Optional reranking; defaults to `false` |
+| `AGENT_USE_HYBRID_SEARCH` | Owner-filtered BM25 keyword + dense retrieval; defaults to `true` |
+| `AGENT_RETRIEVAL_LEXICAL_MAX_CHUNKS` | Maximum owner corpus for local lexical ranking; defaults to `2000`, allowed range `1..10000` |
 
 The chat API origin, key, and model must all be configured to enable responses. Without them, FastAPI still starts but chat returns `LLM_NOT_CONFIGURED`. Indexing also needs a compatible embedding model configured. Requests and retrieved text snippets are sent to the configured model provider.
 
@@ -41,8 +43,19 @@ The web application talks to the Bun proxy, not these internal routes:
 | `GET /api/agent/documents/:id` | `GET /admin/documents/:id` | Read indexing status |
 | `DELETE /api/agent/documents/:id` | `DELETE /admin/documents/:id` | Remove one owned document |
 | `POST /api/agent/chat/stream` | `POST /api/v1/chat/stream` | Stream chat events as SSE |
+| `GET /api/agent/memories` | `GET /api/v1/memories` | List the user's explicit private notes |
+| `POST /api/agent/memories` | `POST /api/v1/memories` | Save `{ "content": "..." }`; owner comes from Bun |
+| `DELETE /api/agent/memories/:id` | `DELETE /api/v1/memories/:id` | Delete one owned note |
 
 The streaming route emits module/thread information, token chunks, tool status, sources, and errors. Health endpoints are available at `/health/live` and `/health/ready` for local process checks.
+
+## Retrieval and explicit memory
+
+The RAG module merges Chroma dense retrieval with BM25L keyword matches through reciprocal rank fusion. Both paths use the authenticated owner filter. Existing vectors need no reindex. If the owner has more chunks than the configured lexical bound, the query uses dense-only results and logs `lexical_corpus_limit`; it does not rank a partial corpus. Optional reranking remains independent.
+
+The **Your memory** card in the workspace saves explicit user notes in PostgreSQL. Notes survive restarts and can be deleted by their owner. The agent has a read-only `search_user_memory` tool; it cannot save/delete notes or copy uploaded content into memory. Notes supply context/preferences and are not document sources. Saving and managing notes needs no AI provider; using them in generated answers requires chat configuration.
+
+The canonical implementation is here. The outer original project was removed after source reconciliation. See [RAG consolidation](../../docs/RAG_CONSOLIDATION.md) for provenance, limits, tests, and rebuilding an already-running agent image.
 
 ## Add a module
 
@@ -87,4 +100,4 @@ To stop local infrastructure while keeping state, run `docker compose stop agent
 
 ## Scope
 
-This service accepts development/test configuration only and requires the Chroma backend. Azure Search, Azure identity/storage/Service Bus, a separate Go authorization server, and cloud deployment scripts remain legacy source and are not active integrations in the localhost setup.
+This service accepts development/test configuration only and requires the Chroma backend. Azure Search and Azure identity/storage/Service Bus adapters remain inactive legacy source. The separate original Go authorization server and Next.js dashboard were retired; Bun and React own those application boundaries. Cloud deployment is not part of this local setup.

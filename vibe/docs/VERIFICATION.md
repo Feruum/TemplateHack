@@ -189,6 +189,29 @@ Docker Desktop and the normal `bun run dev` stack were started as hidden process
 
 The site needed warm-up on its first request; subsequent requests succeeded. Real LLM/embedding settings remain absent, and mail remains disabled. The datathon CLI does not require these providers or the running web stack. The existing lazy 3D chunk size warning remains non-fatal.
 
+## RAG consolidation — 2026-10-16
+
+The user approved one Python agent inside `vibe`, useful search/memory features, verification, and removal of the outer reference directory. The canonical service now includes owner-filtered dense/BM25L retrieval with reciprocal rank fusion and explicit PostgreSQL-backed personal notes. Bun owns authentication and proxies note management; React provides the memory card. Models get a read-only memory tool whose owner is injected by the graph.
+
+| Local check | Result |
+| --- | --- |
+| Full Python agent suite in an isolated container | 43 passed, 1 skipped; the skipped PostgreSQL concurrency scenario ran separately below |
+| Separate PostgreSQL memory suite | 5 passed, including HTTP owner isolation, persistence across connections, forged model-owner rejection, database fixture guard, and atomic concurrent quota |
+| Full FastAPI startup without model credentials | Passed; liveness, authenticated note creation/list/delete, and unauthenticated rejection verified through HTTP |
+| Real ephemeral Chroma with controlled embeddings | Exact-code and Unicode keyword recovery, owner filtering, chunk deduplication, deletion, and bounded-corpus dense fallback passed |
+| Full `bun run check` | Passed with 550 Bun tests and 2 build contracts; type checks, lint, architecture, dependency audit, and workspace builds completed |
+| Final frontend compatibility checks | Webapp type check and targeted ESLint for `MemoryCard.tsx` / `api.ts` passed after concurrent UI changes |
+| Outer reference removal preflight | 263 tracked files; no modified, untracked, ignored, or nested Git files |
+| Private configuration scan | 100 candidate source/doc files scanned; no actual local private values found |
+
+The full Bun result covers the checkout snapshot during that run. A separate ongoing UI task subsequently changed the chat/components and dependencies. Its temporary missing `motion-tokens` import blocked one repeat type check; the later type check passed. Those UI edits were preserved. This consolidation's targeted lint used Bun to execute the existing ESLint installation.
+
+Python tests used the current service source mounted read-only into the already-built locked agent image. Chroma fixtures used deterministic deliberately weak embeddings to distinguish vector-only and keyword recovery. Memory tests used temporary SQLite and a fresh PostgreSQL 18 container on a private test network with no host port or persistent volume. The portable `services/agent/scripts/test-memory-postgres.ps1` helper passed and removed its own PostgreSQL container/network. Development containers and volumes were not restarted or removed.
+
+These tests establish retrieval behavior, persistence, and access boundaries. They do not measure real-provider answer accuracy, semantic retrieval quality, or calibration. No paid/external model calls were made. The existing LangChain/python-json-logger deprecation warnings and lazy 3D chunk warning remain non-fatal.
+
+The original source remains recoverable through Git history, including `daa06fe`. The [consolidation guide](RAG_CONSOLIDATION.md) records the capability disposition, local search limits, memory controls, and the command to rebuild an already-running old agent image. Source changes in this side conversation were left local; staging, commit, push, and restarting the main conversation's running stack were outside its scope.
+
 ## assistant-ui and Arc Free — 2026-10-16
 
 Scope: the existing signed-in RAG chat and selected Arc Free components. The user explicitly requested publication of UI changes only. Separate RAG/memory/consolidation changes were present and continued in the working tree; they remain unpublished by this commit. Shared Markdown and AgentWorkspace changes were staged selectively, preserving the other work.
@@ -213,3 +236,27 @@ Browser scenarios used the existing real account/API harness and isolated test P
 Regression checks also prove incremental text, legacy event compatibility, bounded/filtered history, source deduplication, callback error propagation, cancellation of an idle reader, missing-end interruption, and recovery after an individual server tool fails. Individual tool failures no longer terminate a recoverable server run. Structured AssistantError messages remain actionable in the UI.
 
 Production build warning: the existing shared vendor grouping produces a roughly 942 kB minified webapp vendor chunk (286 kB gzip) with these libraries. The build succeeds; loading performance on slow devices/networks was not benchmarked. Motion emits its expected development warning when reduced motion is enabled. Real LLM/embedding configuration is still required for AI answers and indexing; UI dependency installation does not supply credentials. No cloud deployment or cloud checks were performed.
+
+## Combined RAG memory and interface publication — 2026-10-16
+
+The user subsequently authorized committing all remaining work. This publication combines the RAG consolidation and explicit private memory with the already-published assistant-ui/Arc Free integration. The application [design.md](../design.md) now records library versions, responsibilities, visual conventions, and maintenance rules; the root, application, and webapp READMEs link to it.
+
+Review reproduced a private-client-cache defect: memory notes remained in QueryClient after sign-out because their keys were outside the shared session namespace. Module, document, and memory queries now use session-scoped, owner-specific keys and forward cancellation signals. Changing accounts remounts the workspace to clear chat and drafts. Four regression checks failed before the correction; all five new cache checks passed afterward. Focused follow-up review found no remaining significant issues in the correction.
+
+| Local check | Observed result |
+| --- | --- |
+| Full `bun run check` | Passed, exit 0; template validation, architecture (490 source files), dependency audit, types, lint, suites, and builds |
+| Bun suites | 566 passed, 0 failed, across 88 files |
+| Webapp suite | 91 passed, including five new session-cache/cancellation checks |
+| Build contracts | 2 passed; webapp production build completed against the combined source |
+| Python agent suite | 43 passed, 1 PostgreSQL-only case skipped; read-only source mount, isolated fixtures, no network |
+| Isolated PostgreSQL agent suite | 5 passed, including concurrent quota enforcement, persistence, HTTP ownership, and trusted tool identity |
+| Combined-source Chromium suite | 4 passed in 49.7 seconds; real account/API harness, separate test PostgreSQL, controlled RAG responses |
+| Updated local agent | `docker compose up -d --build agent` passed; existing development PostgreSQL/Chroma volumes preserved |
+| Local endpoint checks | Site, workspace, Bun API health, and agent liveness returned 200; agent readiness remained 503 without embedding configuration |
+| Final Markdown validation | Passed after placing `design.md` inside the application and correcting its local links |
+| Publication preflight | 39 staged source/doc files and 28 frontend outputs scanned; no actual local JWT/internal-agent secrets, private/generated paths, or files of 100 MiB or more |
+
+The Bun total comprises 127 script tests, 21 contract tests, 298 backend unit tests, 20 backend integration tests, 91 webapp tests, and 9 website tests. The browser scenarios exercise both desktop and narrow dark/reduced-motion viewports, sources/tools, module choice, uploads, note save/reload/delete, HTTP/SSE errors, cancellation, and recovery. Desktop/mobile screenshots of the combined page were inspected. Browser RAG responses are controlled and do not establish real-model quality or indexing. The isolated PostgreSQL helper removes only its own containers/network; the browser harness removes its own test database.
+
+Logs remain in ignored `.artifacts/combined-check-20261016.log`, `.artifacts/combined-browser-20261016.log`, and `.artifacts/combined-agent-rebuild-20261016.log`. The normal development applications remain running at `http://localhost:4321/` and `http://localhost:5173/app/assistant`; login is required for the workspace. This is a local launch. External chat/embedding credentials and representative labeled questions remain necessary before making real RAG-quality claims. The previously recorded bundle/deprecation warnings remain non-fatal.

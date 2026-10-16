@@ -6,11 +6,11 @@
 
 ## RAG chat interface libraries
 
-The signed-in `/app/assistant` route uses **@assistant-ui/react 0.15.29** LocalRuntime for chat messages, composer state, scrolling, and cancellation. **Arc Free EmptyState and Badge** provide empty states and status badges; **Motion 14.3.0** is pinned for their animations. TanStack Query still owns document/module data. The existing authenticated Bun/Python backend owns RAG and provider credentials.
+The signed-in `/app/assistant` route uses **@assistant-ui/react 0.15.29** LocalRuntime for chat messages, composer state, scrolling, and cancellation. **Arc Free EmptyState and Badge** provide empty states and status badges; **Motion 14.3.0** is pinned for their animations. TanStack Query owns session-scoped document/module/memory data. The existing authenticated Bun/Python backend owns RAG and provider credentials.
 
-Local integration checks on 2026-10-16 passed: **86 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, cancellation, and HTTP errors. The UI-only publication candidate passed TypeScript and production build checks.
+Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Private caches and pending reads clear on sign-out; changing accounts resets local chat and drafts.
 
-Read [CHAT_UI.md](../docs/CHAT_UI.md) for integration behavior and tests, and retain the [Arc Free license/provenance](src/components/arc/README.md). These additions do not configure a model provider or assistant-ui Cloud.
+Read [design.md](../design.md) for library responsibilities and visual conventions, and [CHAT_UI.md](../docs/CHAT_UI.md) for integration behavior and tests. Retain the [Arc Free license/provenance](src/components/arc/README.md). These additions do not configure a model provider or assistant-ui Cloud.
 
 ## Состояние приложения
 

@@ -1,5 +1,5 @@
 import type { Page, Route } from '@playwright/test'
-import type { AgentChatRequest, AgentDocument } from '@web-app-demo/contracts'
+import type { AgentChatRequest, AgentDocument, AgentMemory } from '@web-app-demo/contracts'
 import { e2ePassword, expect, test, uniqueEmail } from '../helpers/test'
 
 function response(text = 'The guide says 42.') {
@@ -15,6 +15,7 @@ function response(text = 'The guide says 42.') {
 
 async function openAgent(page: Page, chat: (route: Route) => Promise<void>) {
   let documents: AgentDocument[] = []
+  let memories: AgentMemory[] = []
   await page.route('**/api/agent/**', async (route) => {
     const url = new URL(route.request().url())
     if (url.pathname.endsWith('/chat/stream')) return chat(route)
@@ -30,8 +31,24 @@ async function openAgent(page: Page, chat: (route: Route) => Promise<void>) {
       }
       return route.fulfill({ json: { documents } })
     }
-    // Local unpublished memory work can coexist with this UI-only suite.
-    if (url.pathname.endsWith('/memories')) return route.fulfill({ json: { memories: [] } })
+    if (url.pathname.endsWith('/memories')) {
+      expect(route.request().headers()['authorization']?.startsWith('Bearer ')).toBe(true)
+      if (route.request().method() === 'POST') {
+        const payload = route.request().postDataJSON()
+        expect(Object.keys(payload)).toEqual(['content'])
+        const note: AgentMemory = { id: crypto.randomUUID(), content: payload.content, created_at: new Date().toISOString() }
+        memories = [...memories, note]
+        return route.fulfill({ json: note })
+      }
+      return route.fulfill({ json: { memories } })
+    }
+    if (url.pathname.includes('/memories/') && route.request().method() === 'DELETE') {
+      expect(route.request().headers()['authorization']?.startsWith('Bearer ')).toBe(true)
+      const id = url.pathname.split('/').at(-1)
+      expect(memories.some((note) => note.id === id)).toBe(true)
+      memories = memories.filter((note) => note.id !== id)
+      return route.fulfill({ json: { deleted: true } })
+    }
     return route.abort()
   })
   await page.goto('/signup')
@@ -48,7 +65,7 @@ async function openAgent(page: Page, chat: (route: Route) => Promise<void>) {
 }
 
 for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
-  test(`RAG chat sends, retains citations, selects modules, and uploads at ${viewport.width}px`, async ({ page }, testInfo) => {
+  test(`RAG chat sends, retains citations, uploads, and manages memory at ${viewport.width}px`, async ({ page }, testInfo) => {
     await page.setViewportSize(viewport)
     if (viewport.width === 390) await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'dark' })
     const errors: string[] = []
@@ -84,6 +101,16 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     await fileInput.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('Synthetic test document') })
     await expect(page.getByTestId('agent-document')).toContainText('notes.txt')
     await expect(page.getByTestId('agent-document')).toContainText('completed')
+
+    const draft = page.getByLabel('New memory note', { exact: true })
+    await draft.fill('Synthetic preference: concise replies.')
+    await page.getByTestId('agent-memory-save').click()
+    await expect(page.getByTestId('agent-memory-note')).toContainText('Synthetic preference: concise replies.')
+    await expect(draft).toHaveValue('')
+    await page.reload()
+    await expect(page.getByTestId('agent-memory-note')).toContainText('Synthetic preference: concise replies.')
+    await page.getByTestId('agent-memory-delete').click()
+    await expect(page.getByTestId('agent-memory-note')).toHaveCount(0)
     expect(errors).toEqual([])
     await page.evaluate(() => { window.scrollTo(0, 0); return new Promise<void>((resolve) => requestAnimationFrame(() => resolve())) })
     await page.screenshot({ path: testInfo.outputPath(`assistant-${viewport.width}.png`), fullPage: true })

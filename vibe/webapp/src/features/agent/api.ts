@@ -3,18 +3,37 @@ import {
   agentDocumentSchema,
   agentDocumentsResponseSchema,
   agentModulesResponseSchema,
+  agentMemoriesResponseSchema,
+  agentMemoryInputSchema,
+  agentMemorySchema,
+  agentMemoryDeletedSchema,
   AGENT_DOCUMENT_MAX_BYTES,
   type AgentChatRequest,
 } from '@web-app-demo/contracts'
 
 import type { AuthenticatedTransport } from '@/platform/api'
 
-export function getAgentModules(transport: AuthenticatedTransport) {
-  return transport.request('/api/agent/modules', agentModulesResponseSchema)
+export function getAgentModules(transport: AuthenticatedTransport, signal?: AbortSignal) {
+  return transport.request('/api/agent/modules', agentModulesResponseSchema, { signal })
 }
 
-export function getAgentDocuments(transport: AuthenticatedTransport) {
-  return transport.request('/api/agent/documents', agentDocumentsResponseSchema)
+export function getAgentDocuments(transport: AuthenticatedTransport, signal?: AbortSignal) {
+  return transport.request('/api/agent/documents', agentDocumentsResponseSchema, { signal })
+}
+
+export function getAgentMemories(transport: AuthenticatedTransport, signal?: AbortSignal) {
+  return transport.request('/api/agent/memories', agentMemoriesResponseSchema, { signal })
+}
+
+export function createAgentMemory(transport: AuthenticatedTransport, content: string) {
+  return transport.request('/api/agent/memories', agentMemorySchema, {
+    method: 'POST',
+    body: agentMemoryInputSchema.parse({ content }),
+  })
+}
+
+export function deleteAgentMemory(transport: AuthenticatedTransport, id: string) {
+  return transport.request(`/api/agent/memories/${encodeURIComponent(id)}`, agentMemoryDeletedSchema, { method: 'DELETE' })
 }
 
 export async function uploadAgentDocument(transport: AuthenticatedTransport, file: File) {

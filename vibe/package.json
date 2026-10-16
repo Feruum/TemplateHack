@@ -42,6 +42,11 @@
     "yaml": "^2.9.0"
   },
   "scripts": {
+    "datathon:setup": "node scripts/datathon.mjs setup",
+    "datathon:test": "node scripts/datathon.mjs test",
+    "datathon:demo": "node scripts/datathon.mjs demo",
+    "datathon:eda": "node scripts/datathon.mjs eda",
+    "datathon": "node scripts/datathon.mjs run",
     "dev": "node --env-file-if-exists=.env node_modules/turbo/bin/turbo run dev",
     "dev:local": "bun run dev",
     "dev:setup": "bun scripts/dev-local.mjs",

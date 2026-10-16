@@ -17,6 +17,8 @@ Compose publishes service ports on the local machine. The browser must call `/ap
 
 ## Workspace tasks
 
+`datathon/` is an independent local Python CLI, not a web/API module or a Compose service. It owns tabular loading, descriptive EDA, train-only preprocessing, holdout evaluation, and optional submission generation. Its virtual environment and complete dependency pins are separate from the agent service. Root `datathon:*` commands call `scripts/datathon.mjs`; the recommended data/output directories are local and ignored. The [workflow guide](../datathon/README.md) documents its supported formats, statistical boundaries, and reproducibility artifacts.
+
 Bun workspaces manage the JavaScript packages and their dependencies. Turborepo schedules their tasks through the root `turbo.json`. The Python agent remains a Compose service and uses its own Python dependency lockfile.
 
 `bun run dev` runs the root `dev:setup` task once before any workspace dev server starts. That task calls `scripts/dev-local.mjs` to start PostgreSQL, Chroma, and the agent through Compose, then apply Drizzle migrations. After setup succeeds, Turbo starts the Bun backend, the two Vite frontends in parallel. The backend's own runner continues to supervise its API and scheduler together. Ctrl+C stops the app processes; Docker services remain running and their volumes retain local state.

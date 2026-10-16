@@ -138,3 +138,53 @@ The normal `bun run dev` command rebuilt the agent image, started local Compose 
 | `http://localhost:8001/health/live` | HTTP 200 |
 | `http://localhost:8001/health/ready` | HTTP 503; embedding settings are still absent |
 | `http://localhost:3100/api/agent/modules` without a session | HTTP 401 |
+
+## Datathon preparation — 2026-10-16
+
+Scope: the new standalone `datathon/` CLI, its root command wrapper, documentation, and normal local application startup. No official competition dataset or brief was available for this preparation. No cloud checks, deployment, or paid model calls were performed.
+
+The environment used Bun 1.4.2, Python 3.12.14 in `datathon/.venv`, and Docker Engine 29.8.2. The approved Python libraries and their transitive dependencies are pinned in `datathon/requirements.lock`: pandas 3.0.6, scikit-learn 1.9.1, and matplotlib 3.11.2. Setup installed the isolated environment successfully; `pip check` reported no broken requirements. The Bun audit does not audit these Python packages.
+
+| Local check | Result |
+| --- | --- |
+| `bun run datathon:setup` | Passed; pinned installation and `pip check` |
+| `bun run datathon:test` | 24 passed, 0 failed |
+| `bun run datathon:demo --output=.artifacts/datathon-final-20261016` | Passed for classification and regression; reports and JSON/CSV artifacts saved |
+| Full `bun run check` | Passed, exit code 0 |
+| Bun suites | 547 passed, 0 failed, across 86 files |
+| Build contracts | 2 passed; all four workspace builds completed with local cache reuse for unchanged outputs |
+| Architecture, type checks, and lint | Passed; architecture checked 482 source files |
+| Bun dependency audit | Passed with no known application vulnerabilities |
+| Report charts | Embedded PNGs generated; missing-value and distribution charts inspected locally |
+| Publication preflight | 27 candidate files and frontend build outputs checked; no actual local JWT secret or internal agent API key found; local inputs, reports, and environments are ignored |
+| Normal full-stack launch | Site, workspace, API health, and agent liveness returned HTTP 200; outbox scheduler ran |
+
+The Bun total comprises 127 script tests, 19 contracts, 297 backend unit tests, 20 backend integration tests, 75 webapp tests, and 9 website tests. Backend integration checks used their isolated test PostgreSQL instance. Existing agent Python tests, browser scenarios, and provider-backed RAG checks were not rerun; their earlier dated results above remain historical.
+
+The datathon tests cover supported table loading, malformed/duplicate CSV headers and records, missing targets, invalid configuration, deterministic stratified splits, group and time isolation, train-only preprocessing, known metric arithmetic, complete class coverage, prediction schema and category/boolean types, original ID/order retention, ID/report-name collisions, escaped HTML, output ownership, multiclass prediction, and both end-to-end demo tasks. Review found and corrected CSV index inference, prediction type drift, incomplete-class validation, and root `--flag=value` path handling before publication. The final focused review found no remaining issues in those fixes.
+
+### Synthetic demo results
+
+Each task used 300 synthetic rows, seed 42, and a 240/60 train/validation split. The ID was excluded from model features. These figures verify the workflow on deliberately learnable synthetic data; they do not estimate performance on the competition case.
+
+| Task and primary metric | Dummy | Linear | Selected |
+| --- | --- | --- | --- |
+| Classification: balanced accuracy, higher is better | 0.500000 | 0.969697 | Logistic regression |
+| Regression: RMSE, lower is better | 29.691848 | 3.464802 | Ridge |
+
+The complete reports are retained locally under ignored `.artifacts/datathon-final-20261016/{classification,regression}/report.html`. Inputs and run outputs are excluded from publication. Choose the official target, metric, valid split, and submission format when the brief arrives; confirm the rules for prepared code and external tools.
+
+### Application launch
+
+Docker Desktop and the normal `bun run dev` stack were started as hidden processes. The stack remains running. The launcher record and logs are retained under ignored `.artifacts/datathon-dev-20261016-145733/`. Existing development volumes were preserved.
+
+| Endpoint | Observed result |
+| --- | --- |
+| `http://localhost:4321/` | HTTP 200; full public-page HTML returned |
+| `http://localhost:5173/` | HTTP 200 |
+| `http://localhost:3100/health` | HTTP 200 |
+| `http://localhost:8001/health/live` | HTTP 200 |
+| `http://localhost:8001/health/ready` | HTTP 503; embedding settings are absent |
+| `http://localhost:3100/api/agent/modules` without a session | HTTP 401 |
+
+The site needed warm-up on its first request; subsequent requests succeeded. Real LLM/embedding settings remain absent, and mail remains disabled. The datathon CLI does not require these providers or the running web stack. The existing lazy 3D chunk size warning remains non-fatal.

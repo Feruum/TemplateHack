@@ -44,6 +44,10 @@ bun run test:backend
 
 Unit tests do not need services. Integration tests use Docker PostgreSQL when the runner manages it, or an explicit `TEST_DATABASE_URL`. Check `backend/scripts/test-integration.mjs` and the selected test file before running; service setup and cleanup depend on the runner.
 
+## Datathon tests
+
+The separate datathon environment is checked with `bun run datathon:setup`, then `bun run datathon:test`. `bun run datathon:demo` runs real local synthetic classification/regression workflows and renders EDA reports. These checks are separate from `bun run check`, which covers the web/API workspaces; the Python analytics environment is optional for web-only contributors. See [datathon/README.md](../datathon/README.md) for its data and evaluation boundaries.
+
 ## Python agent tests
 
 The agent requires Python 3.12+. From PowerShell:

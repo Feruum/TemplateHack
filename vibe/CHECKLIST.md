@@ -139,6 +139,7 @@
 - Уведомления: штатные правила App Platform в DigitalOcean; ручная настройка Yandex Monitoring по инструкции. Новые сервисы мониторинга, пересылка логов и дежурства нужны лишь после записанного инцидента, где проверки логов не хватило.
 - Границы тестов — по [AGENTS.md](AGENTS.md#testing-and-verification), команды — в [docs/TESTING.md](docs/TESTING.md).
 - Библиотеки, файлы, имена, рефакторинг и объём проверок.
+- Подготовка к дататону от 2026-10-16: отдельный локальный CLI `datathon/` для табличной загрузки, EDA, baseline и оценки классификации/регрессии. Пользователь разрешил pandas, scikit-learn, matplotlib и транзитивные зависимости; окружение изолировано от RAG. Реальный кейс, допустимость готового кода, метрика и формат submission определяются организаторами.
 
 ## 10. Реестр возможностей
 
@@ -154,6 +155,7 @@
 | Возможность | Состояние | Примечание |
 | --- | --- | --- |
 | Auth (email + password) | included | Базовая возможность шаблона. |
+| Datathon tabular workflow | included | `datathon/`: CSV/TSV/JSON/JSONL, EDA с графиками, dummy/linear baseline классификации и регрессии, метрики holdout, group/time split, train-only preprocessing, HTML/JSON-отчёт, синтетическое демо и опциональный submission. Данные/результаты игнорируются Git. Не требует Docker/LLM. См. `datathon/README.md`. |
 | Turborepo task orchestration | included | По запросу пользователя: `bun run dev` один раз запускает Compose и миграции, затем параллельно Bun API/scheduler, два React/Vite-приложения. Сборки и проверки типов учитывают зависимости Bun workspaces; кеш локальный в `.turbo`, удалённый кеш отключён. Dev, setup и проверки собранных файлов не кешируются. Команды — в `docs/COMMANDS.md`. |
 | Admin roles | included | Роли и seed в `backend`, интерфейс администратора в `webapp`. |
 | Password reset email delivery | included | Postbox/Resend за одним портом; выбор через `EMAIL_DELIVERY`. Значение схемы `disabled` не отправляет и не ставит письма в очередь. Локальный `backend/.env.example` выбирает `console` и печатает ссылки. Запрос создаёт `task_outbox`, scheduler обрабатывает очередь каждую минуту. Для production нужны аккаунт провайдера и запущенный runner. См. `docs/EMAIL.md`. |

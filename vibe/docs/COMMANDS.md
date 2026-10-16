@@ -2,6 +2,10 @@
 
 The primary workflow runs on localhost. Run Bun commands from the active application directory, `vibe/`.
 
+## Datathon data commands
+
+With Python 3.12+ installed, `bun run datathon:setup` creates an isolated pinned environment. `bun run datathon:test` runs its unittest suite; `bun run datathon:demo` verifies classification/regression on synthetic data. `bun run datathon:eda --help` and `bun run datathon --help` describe real-data options. No Docker or LLM is needed for data analysis. See [the workflow guide](../datathon/README.md) for target/metric selection, group/time splits, artifacts, and privacy.
+
 ## Start the stack
 
 ```powershell

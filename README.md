@@ -4,17 +4,34 @@ A local hackathon application with a public site, account registration, a privat
 
 Repository: [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack).
 
+## Datathon preparation
+
+The repository includes a standalone [tabular data workflow](vibe/datathon/README.md): CSV/TSV/JSON loading, EDA charts, classification/regression baselines, holdout evaluation, group/time splits, and optional unlabeled predictions. It runs without Docker or AI keys after installing its isolated Python environment.
+
+From `vibe/`, with Python 3.12+ available:
+
+```powershell
+bun run datathon:setup
+bun run datathon:test
+bun run datathon:demo
+```
+
+Demo creates explicitly synthetic reports under ignored `.artifacts/datathon-demo-*`. For competition data, use `bun run datathon:eda` and `bun run datathon` with the actual target, task, and metric. The [workflow guide](vibe/datathon/README.md) explains leakage precautions, artifacts, and submission limits. Confirm the organizer's rules for prepared code; synthetic success does not prove readiness for the unreleased case.
+
 ## What works and what still needs configuration
 
-The active application is `vibe/`. The React/Vite migration check on **2026-10-12** passed **545 Bun tests and 2 build-contract tests**, type checks, lint, workspace builds, the website Storybook build, and the dependency audit. Public-site browser checks covered desktop/mobile navigation, FAQ controls, hydration, and static fallback behavior with JavaScript blocked, reduced motion, and WebGL disabled.
+The active application is `vibe/`. The datathon preparation check on **2026-10-16** passed **24 datathon Python tests, 547 Bun tests, and 2 build-contract tests**, type checks, lint, workspace builds, and the Bun dependency audit. Both synthetic data tasks completed and produced HTML reports, measured model comparisons, and reproducibility artifacts.
+
+The React/Vite migration check on **2026-10-12** also verified the website Storybook build and public-site browser behavior: desktop/mobile navigation, FAQ controls, hydration, and static fallback with JavaScript blocked, reduced motion, and WebGL disabled. Those browser scenarios were not rerun for the standalone data workflow.
 
 The broader **2026-10-07** audit also passed 34 Python tests, 10 account/workspace Chromium scenarios, and 12 RAG runtime checks with a controlled local AI provider. Those results retain their original date; the frontend migration did not rerun the Python or RAG suites. See the [verification report](vibe/docs/VERIFICATION.md) for scope and evidence.
 
-The complete local stack was started and its endpoints checked again on **2026-10-12**. Implemented AI features still require real provider settings.
+The complete local stack was started and its endpoints checked again on **2026-10-16**. Implemented AI features still require real provider settings.
 
 | Capability | Status | Evidence or remaining requirement |
 | --- | --- | --- |
 | Public website and signed-in workspace | Working locally | Both Vite applications start and return HTTP 200 |
+| Datathon loading, EDA, baseline, and evaluation | Working locally on supported tabular data | Classification/regression demos and 24 focused tests passed; the actual case still determines the target, split, metric, and submission format |
 | Account registration, sign-in, sessions, and logout | Working | Covered by real browser and backend integration scenarios |
 | Profile editing and avatars | Working with local storage | Upload, reload, replacement, removal, and retry passed in Chromium |
 | User/admin roles and protected routes | Working | Access separation and session revocation after role changes were tested; admin screens require an admin account |
@@ -44,6 +61,7 @@ No external AI or email provider is configured in the current local environment.
 | Background work | Croner and the PostgreSQL task outbox | Scheduled job execution and retryable queued work |
 | Local infrastructure | Docker Compose, uv / `uv.lock`, Bun workspaces, Turborepo | Local services, locked dependencies, ordered tasks, and local build caching |
 | Checks and tooling | Bun test, pytest, Playwright / Chromium, ESLint, TypeScript, Storybook | Automated checks and optional component catalogs |
+| Datathon analysis | pandas, NumPy, scikit-learn, SciPy, matplotlib | Isolated EDA, dummy/linear baselines, holdouts, and reproducible reports |
 
 AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid provider is automatically selected or provisioned. Go, ConnectRPC, Kratos, SpiceDB, and Next.js belong to the reference project, not the active local runtime.
 
@@ -57,6 +75,7 @@ AI uses configurable OpenAI-compatible chat and embedding endpoints. No paid pro
 | [vibe/backend](vibe/backend/README.md) | Active backend | Bun API, authentication, permissions, file storage, scheduler, and agent proxy |
 | [vibe/services/agent](vibe/services/agent/README.md) | Active internal service | Python agent modules, RAG ingestion/retrieval, and conversation state |
 | [vibe/packages/contracts](vibe/packages/contracts/README.md) | Shared package | Zod contracts and TypeScript types used by the API and workspace |
+| [vibe/datathon](vibe/datathon/README.md) | Local data workflow | EDA, classification/regression baselines, quality evaluation, and synthetic verification |
 | [vibe/infra](vibe/infra/README.md) | Optional deployment source | Infrastructure definitions and release helpers; outside the verified local launch |
 | [agentic-rag](agentic-rag/README.md) | Reference source | Original standalone RAG monorepo; its Go auth service and Next.js dashboard are outside the active launch path |
 

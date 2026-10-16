@@ -10,13 +10,27 @@ A local-first starter for hackathon projects. React/Vite serves the pre-rendered
 
 This application is stored under `vibe/` in [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack). Run the commands below from `vibe/`. Git is configured in its parent workspace. The sibling `agentic-rag/` directory is reference source and is not started by these commands.
 
+## Datathon data workflow
+
+Use [datathon/](datathon/README.md) for local tabular loading, EDA charts, classification/regression baselines, quality metrics, and optional predictions. It is independent of Docker and AI credentials. With Python 3.12+ installed:
+
+```powershell
+bun run datathon:setup
+bun run datathon:test
+bun run datathon:demo
+```
+
+The isolated environment is pinned in `datathon/requirements.lock`. Demo creates HTML reports for two deterministic synthetic tasks. Keep real data in ignored `datathon/data/` and experiments in ignored `datathon/runs/`. Follow the [guide](datathon/README.md) to choose the official target/metric and a valid random, group, or chronological split. Competition rules and hidden-test performance still require the official brief.
+
 ## Current status and stack
 
-The React/Vite migration check passed on 2026-10-12: 545 Bun tests, 2 build-contract checks, workspace type checks, lint, builds, the website Storybook build, and the application dependency audit. Public-site browser checks passed for desktop/mobile navigation, FAQ controls, hydration, and JavaScript/reduced-motion/WebGL fallbacks. The public site and workspace now use the same React/Vite framework stack.
+The datathon preparation check passed on 2026-10-16: 24 datathon Python tests, 547 Bun tests, 2 build-contract checks, workspace type checks, lint, builds, and the Bun dependency audit. Both synthetic data demos completed with measured dummy/linear comparisons and HTML reports. Python dependency installation and `pip check` passed in the separate virtual environment.
+
+The React/Vite migration check on 2026-10-12 also verified the website Storybook build and public-site browser behavior: desktop/mobile navigation, FAQ controls, hydration, and JavaScript/reduced-motion/WebGL fallbacks. These browser checks were not rerun for the standalone data workflow. The public site and workspace use the same React/Vite framework stack.
 
 The broader 2026-10-07 audit also passed 34 Python tests and 10 account/workspace Chromium scenarios. Registration, sessions, profile/avatars, user/admin access, and the local API/scheduler were covered by that audit. These older results retain their date; the migration did not rerun the Python or RAG suites.
 
-The complete local stack was restarted on 2026-10-12. The site, workspace, API health, and agent liveness returned HTTP 200. Agent readiness still returned HTTP 503 without embedding settings. Development data volumes were preserved.
+The complete local stack was restarted on 2026-10-16. The site, workspace, API health, and agent liveness returned HTTP 200. Agent readiness still returned HTTP 503 without embedding settings. Development data volumes were preserved.
 
 The RAG module is implemented and passed 12 runtime checks for PDF/TXT, indexing, streaming, citations, conversation persistence, and owner isolation with a controlled AI provider. The current local `.env` has no real LLM or embedding settings: chat returns `LLM_NOT_CONFIGURED`, and full agent readiness returns HTTP 503 until embeddings are configured. Password-reset mail defaults to disabled. Real cloud integrations, payments, and mobile are outside this verified local launch.
 

@@ -1,8 +1,8 @@
 import { ArrowRight, Check, Sparkles } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
-import { buttonVariants } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/interface/badge'
+import { ButtonLink } from '@/components/interface/button'
+import { Card } from '@/components/interface/card'
 
 import HeroScene from './HeroScene'
 
@@ -27,8 +27,7 @@ export default function HeroSection({ primaryHref, primaryLabel, secondaryHref, 
 
   <div className="site-container grid items-center gap-14 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
     <div className="min-w-0 max-w-3xl">
-      <Badge variant="outline" className="border-white/15 bg-white/6 text-white/80">
-        <Sparkles data-icon="inline-start" aria-hidden="true" />
+      <Badge icon={<Sparkles className="size-3" aria-hidden="true" />}>
         Шаблон проекта для работы с ИИ
       </Badge>
       <h1
@@ -42,20 +41,17 @@ export default function HeroSection({ primaryHref, primaryLabel, secondaryHref, 
         сервер, компоненты и проверки. Вы ставите задачу обычными словами, ИИ-агент меняет код и показывает результат.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a className={buttonVariants({ className: 'glow-surface h-11 rounded-full px-6 font-bold', size: 'lg' })} href={primaryHref}>
+        <ButtonLink className="glow-surface" size="lg" href={primaryHref}>
           {primaryLabel}
           <ArrowRight data-icon="inline-end" aria-hidden="true" />
-        </a>
-        <a
-          className={buttonVariants({
-            className: 'h-11 rounded-full border-white/15 bg-white/5 px-6 font-bold text-white hover:bg-white/10',
-            size: 'lg',
-            variant: 'outline',
-          })}
+        </ButtonLink>
+        <ButtonLink
+          size="lg"
+          variant="secondary"
           href={secondaryHref}
         >
           {secondaryLabel}
-        </a>
+        </ButtonLink>
       </div>
       <ul className="mt-8 grid gap-3 text-sm text-white/60 sm:grid-cols-3" aria-label="Преимущества">
         {['Первые задачи — без ручного программирования', 'Все части в одном проекте', 'Код остаётся у вас'].map((item) => (
@@ -71,16 +67,22 @@ export default function HeroSection({ primaryHref, primaryLabel, secondaryHref, 
 
     <div className="relative mx-auto min-w-0 w-full max-w-xl lg:mx-0">
       <div className="glow-halo absolute -inset-6 -z-10 rounded-[2.5rem] blur-2xl" aria-hidden="true"></div>
-      <Card className="glow-surface gap-0 overflow-hidden rounded-2xl bg-[#0d0d0d] py-0 ring-1 ring-white/12">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 bg-[#080808] px-5 py-4">
+      <Card
+        className="glow-surface"
+        title="Ваш проект"
+        titleAs="p"
+        titlePosition="header"
+        padding="none"
+        lift={false}
+        header={
           <div className="flex items-center gap-2" aria-hidden="true">
             <span className="size-2.5 rounded-full bg-white/25"></span>
             <span className="size-2.5 rounded-full bg-white/45"></span>
             <span className="size-2.5 rounded-full bg-white/70"></span>
           </div>
-          <span className="text-xs font-bold text-white/55">Ваш проект</span>
-        </CardHeader>
-        <CardContent className="relative h-[27rem] overflow-hidden p-0 sm:h-[31rem]" data-hero-visual>
+        }
+      >
+        <div className="relative h-[27rem] overflow-hidden sm:h-[31rem]" data-hero-visual>
           <HeroScene />
 
           <div className="pointer-events-none absolute top-5 right-5 left-5 flex items-center justify-between gap-3" aria-hidden="true">
@@ -105,7 +107,7 @@ export default function HeroSection({ primaryHref, primaryLabel, secondaryHref, 
               </div>
             ))}
           </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   </div>

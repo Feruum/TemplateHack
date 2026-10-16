@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/interface/badge'
+import { Card } from '@/components/interface/card'
 import SectionIntro from './SectionIntro'
 
 const steps = [
@@ -35,17 +35,16 @@ export default function ProcessSection() {
     <ol className="grid gap-4">
       {steps.map((step) => (
         <li key={step.number}>
-          <Card className="py-0">
-            <CardContent className="grid gap-4 p-5 sm:grid-cols-[auto_1fr] sm:items-start sm:p-6">
-              <Badge className="h-8 min-w-11 font-bold tabular-nums" variant="secondary">
+          <Card
+            title={step.title}
+            description={step.description}
+            contentLayout="leading"
+            leading={
+              <Badge className="h-8 min-w-11 tabular-nums">
                 {step.number}
               </Badge>
-              <div>
-                <h3 className="font-heading text-lg font-bold">{step.title}</h3>
-                <p className="mt-2 leading-6 text-muted-foreground">{step.description}</p>
-              </div>
-            </CardContent>
-          </Card>
+            }
+          />
         </li>
       ))}
     </ol>

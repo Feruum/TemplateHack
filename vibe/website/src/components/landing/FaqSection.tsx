@@ -1,5 +1,4 @@
-import { cn } from '@/lib/utils'
-import { Plus } from 'lucide-react'
+import { ProgressiveAccordion } from '@/components/interface/accordion'
 
 import SectionIntro from './SectionIntro'
 
@@ -30,6 +29,8 @@ const questions = [
   },
 ]
 
+const faqItems = questions.map(({ question, answer }) => ({ title: question, content: answer }))
+
 export default function FaqSection() {
   return (
 <section className="border-b bg-muted/35 py-20 sm:py-24" id="faq" aria-labelledby="faq-title">
@@ -44,17 +45,7 @@ export default function FaqSection() {
     </div>
 
     <div className="overflow-hidden rounded-2xl border bg-card px-5 sm:px-7">
-      {questions.map(({ question, answer }, index) => (
-        <details key={index} className={cn('group py-5 sm:py-6', index > 0 && 'border-t')}>
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-heading text-base font-bold focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-lg [&::-webkit-details-marker]:hidden">
-            {question}
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/10 text-white/70 transition-transform duration-200 group-open:rotate-45">
-              <Plus className="size-4" aria-hidden="true" />
-            </span>
-          </summary>
-          <p className="max-w-2xl pt-4 pr-12 leading-7 text-muted-foreground">{answer}</p>
-        </details>
-      ))}
+      <ProgressiveAccordion items={faqItems} />
     </div>
   </div>
 </section>

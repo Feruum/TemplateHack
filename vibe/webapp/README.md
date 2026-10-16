@@ -6,9 +6,15 @@
 
 ## RAG chat interface libraries
 
+Active workspace controls use **Arc Free** through `src/components/interface/`, with copied MIT source in `src/components/arc/`. Forms, cards, buttons, alerts, Select, search, table, avatar/menu, badges, skeletons, and empty states use Arc. Chats retain assistant-ui. Sidebar/Sheet support, Field, Item, Separator, Spinner, and destructive AlertDialog remain shadcn/ui fallbacks. See [ARC_MIGRATION.md](../docs/ARC_MIGRATION.md).
+
+The Arc migration passed final types, lint, **97 webapp tests**, and the production build. Workspace browser coverage includes 18 distinct scenarios across the full run and targeted reruns; the expanded mobile focus/pointer/Escape regression passed three repetitions at each of 390px and 700px. See [dated verification](../docs/VERIFICATION.md).
+
+Account avatars use **Blobatar 2.7.0** generated locally from the stable account ID, with uploaded photos taking precedence. The account menu and profile share the same face. The assistant-ui waiting state includes its decorative `thinking` expression. See [BLOBATAR.md](../docs/BLOBATAR.md) for ownership and focused checks.
+
 The signed-in `/app/assistant` route uses **@assistant-ui/react 0.15.29** LocalRuntime for chat messages, composer state, scrolling, and cancellation. **Arc Free EmptyState and Badge** provide empty states and status badges; **Motion 14.3.0** is pinned for their animations. TanStack Query owns session-scoped document/module/memory data. The existing authenticated Bun/Python backend owns RAG and provider credentials.
 
-Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Private caches and pending reads clear on sign-out; changing accounts resets local chat and drafts.
+Earlier RAG integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Private caches and pending reads clear on sign-out; changing accounts resets local chat and drafts.
 
 Read [design.md](../design.md) for library responsibilities and visual conventions, and [CHAT_UI.md](../docs/CHAT_UI.md) for integration behavior and tests. Retain the [Arc Free license/provenance](src/components/arc/README.md). These additions do not configure a model provider or assistant-ui Cloud.
 
@@ -95,7 +101,7 @@ Access-токен живёт только в памяти браузера. Refr
 
 Общие fetch, базовый URL и разбор ошибок находятся в `src/platform/api` без знания конкретных endpoint. Каждый `src/features/<context>` владеет путями, схемами, запросами и провайдером. Страницы импортируют только публичные `index.ts`. Функции используют platform и UI; platform и `src/components/ui` не импортируют продуктовые функции. После изменения границ выполни `bun run architecture:check`.
 
-`src/components/ui` — официальный генерируемый реестр shadcn. Он должен допускать полное пересоздание. Импортируй примитивы через `@/components/ui/*`. Храни композиции и обёртки вне реестра: типографику в `src/components/typography.tsx`, общие панели в `src/components/dashboard`, продуктовые панели рядом с их состоянием.
+`src/components/ui` is the retained generated shadcn registry. Active screens import Arc through `@/components/interface/*`; import from `@/components/ui/*` only for documented missing Free equivalents or assistant-ui chat support. Keep copied Arc source in `src/components/arc`, Typography in its shared owner, and product compositions in their features. Optional Storybook examples retain the full shadcn catalog.
 
 Продуктовый компонент владеет поверхностью, отступами, скруглением, типографикой, адаптацией и размерами элементов. Его props описывают данные, состояния и callbacks. Не открывай обход через `className` или `style`.
 

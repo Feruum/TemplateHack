@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+import { Card } from '@/components/interface/card'
+import { Separator } from '@/components/interface/separator'
 import SectionIntro from './SectionIntro'
 
 const metrics = [
@@ -23,18 +23,17 @@ export default function ProofSection() {
     </div>
 
     <div className="mt-12 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-      <Card className="glow-surface justify-between bg-[#0d0d0d] text-white ring-white/12">
-        <CardContent className="flex h-full flex-col justify-between gap-10 p-7 sm:p-9">
-          <p className="text-sm font-bold tracking-[0.16em] text-white/55 uppercase">Без закрытого конструктора</p>
-          <p className="glow-text font-heading text-2xl leading-snug font-bold text-balance sm:text-3xl">
-            Проект состоит из обычных исходных файлов. Их можно хранить в своём репозитории,
-            открывать в редакторе и передавать разработчику.
-          </p>
-        </CardContent>
-      </Card>
+      <Card
+        className="glow-surface"
+        title="Проект состоит из обычных исходных файлов. Их можно хранить в своём репозитории, открывать в редакторе и передавать разработчику."
+        titleAs="p"
+        titleSize="large"
+        eyebrow="Без закрытого конструктора"
+        padding="comfortable"
+        lift={false}
+      />
 
-      <Card>
-        <CardContent className="flex h-full flex-col justify-center p-7 sm:p-9">
+      <Card padding="comfortable" lift={false}>
           {metrics.map(([value, label], index) => (
             <div key={index}>
               {index > 0 && <Separator className="my-6" />}
@@ -42,7 +41,6 @@ export default function ProofSection() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{label}</p>
             </div>
           ))}
-        </CardContent>
       </Card>
     </div>
   </div>

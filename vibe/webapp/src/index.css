@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "../../styles/vendor/shadcn/tailwind.css";
 @import "@fontsource-variable/figtree";
+@import "./components/arc/arc-tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 

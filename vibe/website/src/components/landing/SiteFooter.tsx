@@ -1,4 +1,4 @@
-import { Separator } from '@/components/ui/separator'
+import { Separator } from '@/components/interface/separator'
 import BrandMark from './BrandMark'
 
 export default function SiteFooter({ year }: { year: number }) {

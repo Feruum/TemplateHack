@@ -5,15 +5,15 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/interface/alert'
+import { Badge } from '@/components/interface/badge'
+import { Button } from '@/components/interface/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-} from '@/components/ui/card'
+} from '@/components/interface/card'
 import {
   Item,
   ItemActions,

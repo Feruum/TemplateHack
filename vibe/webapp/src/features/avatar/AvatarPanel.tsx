@@ -1,10 +1,10 @@
 import type { UserDto } from '@web-app-demo/contracts'
 import { useRef, useState, type ChangeEvent } from 'react'
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
+import { Alert, AlertDescription, AlertTitle } from '@/components/interface/alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/interface/avatar'
+import { Button } from '@/components/interface/button'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/interface/card'
 import { FieldDescription } from '@/components/ui/field'
 import { Typography } from '@/components/typography'
 import { ApiRequestError } from '@/platform/api'
@@ -55,7 +55,7 @@ export function AvatarPanel({ user }: { user: UserDto }) {
       </CardHeader>
       <CardContent className="grid gap-5">
         <div className="flex flex-wrap items-center gap-5">
-          <Avatar data-testid="avatar-preview" size="xl">
+          <Avatar data-testid="avatar-preview" size="xl" seed={user.id} name={user.displayName?.trim() || user.email}>
             {imageUrl && <AvatarImage alt="" src={imageUrl} />}
             <AvatarFallback data-testid="avatar-fallback">{initials(user)}</AvatarFallback>
           </Avatar>

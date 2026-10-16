@@ -59,7 +59,7 @@ test('promoting a user revokes the old session and opens the admin workspace aft
   await adminPage.getByRole('link', { name: 'Users' }).click()
 
   await adminPage.getByLabel('Search users').fill(userEmail)
-  await adminPage.getByRole('button', { name: 'Search' }).click()
+  await adminPage.getByRole('button', { name: 'Search', exact: true }).click()
   const roleSelect = adminPage.getByLabel(`Role for ${userEmail}`)
   await expect(roleSelect).toBeVisible()
   await roleSelect.click()

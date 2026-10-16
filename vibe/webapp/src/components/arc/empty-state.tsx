@@ -17,6 +17,8 @@ export interface EmptyStateProps {
   className?: string;
   /** Optional accessible label for the state region. */
   label?: string;
+  /** Retain a route's semantic heading and composed accessible description. */
+  headerContent?: ReactNode;
 }
 
 const exitFast: Transition = { duration: motionTokens.duration.fast, ease: [...motionTokens.ease.standard] };
@@ -72,7 +74,7 @@ function HeightFrame({ reduce, morphKey, children }: { reduce: boolean | null; m
   </motion.div>;
 }
 
-export function EmptyState({ title, description, action, icon, className, label }: EmptyStateProps) {
+export function EmptyState({ title, description, action, icon, className, label, headerContent }: EmptyStateProps) {
   const reduce = useReducedMotion();
   const glyph = icon ?? <HugeiconsIcon icon={FileNotFoundIcon} size={24} strokeWidth={1.5} />;
   const enter: Transition = reduce ? { duration: motionTokens.duration.instant } : { duration: motionTokens.duration.standard, ease: [...motionTokens.ease.enter] };
@@ -81,8 +83,8 @@ export function EmptyState({ title, description, action, icon, className, label 
   return <section className={[styles.root, className].filter(Boolean).join(" ")} aria-label={label}>
     <div className={styles.icon} aria-hidden="true"><AnimatePresence mode="popLayout" initial={false}><Swap key={iconKey(glyph)} className={styles.glyph} initial={reduce ? { opacity: 0 } : iconIn} animate={shown} exit={reduce ? fadeOut : { ...iconIn, transition: exitFast }} transition={reduce ? enter : motionTokens.spring.snappy}>{glyph}</Swap></AnimatePresence></div>
     <HeightFrame reduce={reduce} morphKey={`${title}\n${description}`}>
-      <Typography as="h3" variant="bodySmMedium"><AnimatePresence mode="popLayout" initial={false}><Swap key={title} className={styles.line} {...swap}>{title}</Swap></AnimatePresence></Typography>
-      <Typography as="p" variant="bodySm" tone="muted"><AnimatePresence mode="popLayout" initial={false}><Swap key={description} className={styles.line} {...swap}>{description}</Swap></AnimatePresence></Typography>
+      {headerContent ?? <><Typography as="h3" variant="bodySmMedium"><AnimatePresence mode="popLayout" initial={false}><Swap key={title} className={styles.line} {...swap}>{title}</Swap></AnimatePresence></Typography>
+      <Typography as="p" variant="bodySm" tone="muted"><AnimatePresence mode="popLayout" initial={false}><Swap key={description} className={styles.line} {...swap}>{description}</Swap></AnimatePresence></Typography></>}
     </HeightFrame>
     {action && <Typography as="div" className={styles.action}>{action}</Typography>}
   </section>;

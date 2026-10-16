@@ -12,11 +12,15 @@ This application is stored under `vibe/` in [Feruum/TemplateHack](https://github
 
 The agent combines owner-filtered vector and keyword retrieval, optional reranking, streaming citations, and PostgreSQL conversation state. The workspace's **Your memory** card lets each user save/delete private preferences. The model can read those notes but cannot write or delete them. Existing running agent containers need a rebuild to load the new Python routes; the [guide](docs/RAG_CONSOLIDATION.md#run-and-verify) explains it.
 
-## RAG chat interface libraries
+## Interface libraries
+
+The active public site and signed-in workspace use **Arc Free** copied MIT source for controls, forms, cards, selectors, tables, menus, loading/empty states, and FAQ. Chats remain on **assistant-ui**. Existing **shadcn/ui** supplies missing Free equivalents: Sidebar/Sheet support, Field, Item, Separator, Spinner, and specialized AlertDialog. See the [migration/fallback report](docs/ARC_MIGRATION.md) and [design.md](design.md).
+
+Arc migration verification on 2026-10-16 passed: full `bun run check`, final **97 webapp tests**, types/lint/builds, **18 distinct workspace browser scenarios across the full run and targeted reruns**, and **7 production-site cases**. The mobile keyboard/focus regression passed three repetitions at both 390px and 700px. See [VERIFICATION.md](docs/VERIFICATION.md) for boundaries and remaining provider configuration.
 
 The existing `/app/assistant` screen uses **assistant-ui 0.15.29** LocalRuntime and primitives for the chat lifecycle. Selected **Arc Free** EmptyState/Badge source and **Motion 14.3.0** provide empty states and status badges. Requests still use the authenticated Bun SSE proxy; provider keys remain server-side. No assistant-ui Cloud account is required.
 
-Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Session-scoped agent caches clear on sign-out and account replacement.
+Earlier RAG integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Types and production builds passed. Session-scoped agent caches clear on sign-out and account replacement.
 
 The [design guide](design.md) records the frontend libraries and visual conventions. The [chat UI guide](docs/CHAT_UI.md) explains component ownership, keyboard/cancellation behavior, citations, errors, checks, and remaining AI configuration. Preserve the [Arc MIT license and source record](webapp/src/components/arc/README.md).
 

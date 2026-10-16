@@ -6,6 +6,12 @@ The active test workflow runs locally. Run these commands from the application d
 
 Run `bun run --cwd webapp test` for the assistant-ui adapter/SSE and agent-session cache regression tests. Cache tests cover sign-out, replacement login, cross-account reads, and cancellation. Run `bun run --cwd webapp e2e agent.spec.ts` for the existing real account/API harness with controlled RAG responses and its isolated test PostgreSQL database. The browser cases cover desktop/mobile chat, sources/tools, module selection, uploads, note save/reload/delete, terminal SSE/HTTP errors, stop, and recovery. They require the installed Chromium runner and do not prove real-provider answer quality. See [CHAT_UI.md](CHAT_UI.md) for ownership and reproduction details.
 
+## Arc interface checks
+
+Run `bun run --cwd webapp e2e arc-interface.spec.ts` for desktop/mobile account, profile, saved appearance, admin routes, and nested mobile account-menu focus/Escape. Run the complete `bun run e2e:webapp` for real registration/session/avatar/RBAC flows and the existing controlled-provider RAG scenarios. The harness uses its own test PostgreSQL; do not point it at development data. Search now has a separate clear button, so action locators must distinguish submit from clear.
+
+For the public production site, verify desktop/mobile/tablet navigation, multiple FAQ disclosures, keyboard controls, native operation without JavaScript, reduced motion, and the static hero when WebGL is unavailable. Screenshots are review evidence, not style assertions. Existing build contracts still verify static HTML, asset separation, and exclusion of optional Storybook-only CSS. See [ARC_MIGRATION.md](ARC_MIGRATION.md) for component and behavior scope.
+
 ## Fast checks
 
 ```powershell

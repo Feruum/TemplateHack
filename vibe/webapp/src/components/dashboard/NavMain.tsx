@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { Typography } from '@/components/typography'
 import type { WorkspaceRoutePath } from '@/features/navigation'
@@ -25,6 +26,7 @@ export function NavMain({
 }: {
   items: ReadonlyArray<DashboardNavigationItem>
 }) {
+  const { isMobile, state } = useSidebar()
   return (
     <nav aria-label="Primary navigation">
       <SidebarGroup>
@@ -36,7 +38,7 @@ export function NavMain({
                 <SidebarMenuButton
                   asChild
                   isActive={item.isActive}
-                  tooltip={item.label}
+                  tooltip={!isMobile && state === 'collapsed' ? item.label : undefined}
                 >
                   <DashboardLink to={item.to}>
                     <HugeiconsIcon icon={item.icon} strokeWidth={2} />

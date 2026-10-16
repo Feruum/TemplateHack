@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/interface/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-} from '@/components/ui/card'
+} from '@/components/interface/card'
 import { Typography } from '@/components/typography'
 
 export function DataTableFrame({

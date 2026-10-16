@@ -1,7 +1,7 @@
 import { Code2, Gauge, Layers3, Search } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/interface/badge'
+import { Card } from '@/components/interface/card'
 import SectionIntro from './SectionIntro'
 
 const kitItems = [
@@ -65,15 +65,14 @@ export default function LaunchKitSection() {
 
     <div className="relative mx-auto w-full max-w-lg">
       <div className="glow-halo absolute -inset-6 -z-10 rounded-[2.5rem] blur-3xl" aria-hidden="true"></div>
-      <Card className="glow-surface gap-0 overflow-hidden rounded-2xl bg-[#0d0d0d] py-0 text-white ring-1 ring-white/12">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 px-6 py-5">
-          <div>
-            <p className="text-xs text-white/55">Перед первой задачей</p>
-            <p className="mt-1 font-heading text-lg font-bold">Что настроить под себя</p>
-          </div>
-          <Badge className="font-bold">4 пункта</Badge>
-        </CardHeader>
-        <CardContent className="p-6">
+      <Card
+        className="glow-surface"
+        title="Что настроить под себя"
+        titlePosition="header"
+        eyebrow="Перед первой задачей"
+        headerAction={<Badge>4 пункта</Badge>}
+        lift={false}
+      >
           <ul className="space-y-3">
             {firstSetup.map(([label, action], index) => (
               <li key={index} className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5">
@@ -87,7 +86,6 @@ export default function LaunchKitSection() {
               </li>
             ))}
           </ul>
-        </CardContent>
       </Card>
     </div>
   </div>

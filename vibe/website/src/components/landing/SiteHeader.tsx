@@ -1,6 +1,7 @@
 import { Menu, X } from 'lucide-react'
 
-import { buttonVariants } from '@/components/ui/button'
+import { ButtonLink } from '@/components/interface/button'
+import { ProgressiveDropdownMenu } from '@/components/interface/dropdown-menu'
 import BrandMark from './BrandMark'
 
 interface Props {
@@ -35,12 +36,19 @@ export default function SiteHeader({ primaryHref, primaryLabel }: Props) {
     </nav>
 
     <div className="hidden md:block">
-      <a className={buttonVariants({ className: 'glow-surface rounded-full px-4 font-bold', size: 'sm' })} href={primaryHref}>
+      <ButtonLink className="glow-surface" size="sm" href={primaryHref}>
         {primaryLabel}
-      </a>
+      </ButtonLink>
     </div>
 
-    <details className="group relative md:hidden">
+    <ProgressiveDropdownMenu
+      label="Меню"
+      menuLabel="Мобильная навигация"
+      icon={<Menu className="size-5" aria-hidden="true" />}
+      iconOnly
+      items={[...navigation, { href: primaryHref, label: primaryLabel, separatorBefore: true }]}
+    >
+    <details className="group relative" suppressHydrationWarning>
       <summary
         className="grid size-10 cursor-pointer list-none place-items-center rounded-md border border-white/15 bg-white/5 text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden"
         aria-label="Меню"
@@ -57,11 +65,12 @@ export default function SiteHeader({ primaryHref, primaryLabel }: Props) {
             {item.label}
           </a>
         ))}
-        <a className={buttonVariants({ className: 'mt-2 w-full rounded-full font-bold', size: 'sm' })} href={primaryHref}>
+        <ButtonLink className="mt-2 w-full" size="sm" href={primaryHref}>
           {primaryLabel}
-        </a>
+        </ButtonLink>
       </nav>
     </details>
+    </ProgressiveDropdownMenu>
   </div>
 </header>
   )

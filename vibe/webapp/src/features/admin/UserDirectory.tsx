@@ -1,5 +1,3 @@
-import { Search01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import {
   userRoleSchema,
   type AdminUserSummary,
@@ -14,36 +12,19 @@ import {
   AlertAction,
   AlertDescription,
   AlertTitle,
-} from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+} from '@/components/interface/alert'
+import { Button } from '@/components/interface/button'
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-} from '@/components/ui/empty'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+} from '@/components/interface/empty'
+import { SearchField } from '@/components/interface/search-field'
 import { Item } from '@/components/ui/item'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Select } from '@/components/interface/select'
+import { Skeleton } from '@/components/interface/skeleton'
+import { SortableDataTable, type DataColumn } from '@/components/interface/table'
 import { Typography } from '@/components/typography'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { formatDate } from '@/platform/intl'
@@ -150,18 +131,14 @@ export function UserDirectory({ currentUser }: { currentUser: UserDto }) {
           summary={summary}
           title="User directory"
           toolbar={
-            <form className="flex flex-col gap-2 sm:flex-row" onSubmit={submitSearch}>
-              <InputGroup>
-                <InputGroupAddon>
-                  <HugeiconsIcon aria-hidden icon={Search01Icon} strokeWidth={2} />
-                </InputGroupAddon>
-                <InputGroupInput
-                  aria-label="Search users"
-                  onChange={(event) => setDraftQuery(event.target.value)}
-                  placeholder="Search by email or name"
-                  value={draftQuery}
-                />
-              </InputGroup>
+            <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={submitSearch}>
+              <SearchField
+                aria-label="Search users"
+                label="Search users"
+                onValueChange={setDraftQuery}
+                placeholder="Search by email or name"
+                value={draftQuery}
+              />
               <Button type="submit">Search</Button>
             </form>
           }
@@ -214,45 +191,54 @@ function UserTable({
   onRoleChange,
   users,
 }: DirectoryRowsProps) {
+  const columns: DataColumn<AdminUserSummary>[] = [
+    {
+      key: 'displayName',
+      label: 'User',
+      sortable: false,
+      render: (_value, user) => (
+        <div className="grid">
+          <Typography variant="bodySmMedium">
+            {user.displayName ?? user.email}
+          </Typography>
+          <Typography variant="caption" tone="muted">
+            {user.email}
+          </Typography>
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      sortable: false,
+      render: (_value, user) => (
+        <RoleSelect
+          currentUser={currentUser}
+          disabled={isRoleChangePending}
+          onRoleChange={onRoleChange}
+          user={user}
+        />
+      ),
+    },
+    {
+      key: 'createdAt',
+      label: 'Created',
+      sortable: false,
+      render: (_value, user) => (
+        <Typography as="span" className="tabular-nums" variant="bodySm">
+          {formatDate(user.createdAt)}
+        </Typography>
+      ),
+    },
+  ]
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>User</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Created</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {users.map((user) => (
-          <TableRow key={user.id}>
-            <TableCell>
-              <div className="grid">
-                <Typography variant="bodySmMedium">
-                  {user.displayName ?? user.email}
-                </Typography>
-                <Typography variant="caption" tone="muted">
-                  {user.email}
-                </Typography>
-              </div>
-            </TableCell>
-            <TableCell>
-              <RoleSelect
-                currentUser={currentUser}
-                disabled={isRoleChangePending}
-                onRoleChange={onRoleChange}
-                user={user}
-              />
-            </TableCell>
-            <TableCell>
-              <Typography as="span" className="tabular-nums" variant="bodySm">
-                {formatDate(user.createdAt)}
-              </Typography>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <SortableDataTable
+      caption="Users"
+      columns={columns}
+      rowKey="id"
+      rows={[...users]}
+    />
   )
 }
 
@@ -330,28 +316,26 @@ function RoleSelect({
 }) {
   return (
     <Select
+      aria-label={`Role for ${user.email}`}
+      className="w-28 capitalize"
       disabled={disabled}
+      label="Role"
       onValueChange={(value) => {
         const parsedRole = userRoleSchema.safeParse(value)
         if (parsedRole.success && parsedRole.data !== user.role) {
           onRoleChange(user, parsedRole.data)
         }
       }}
+      options={[
+        {
+          disabled: user.id === currentUser.id && user.role === 'admin',
+          label: 'User',
+          value: 'user',
+        },
+        { label: 'Admin', value: 'admin' },
+      ]}
       value={user.role}
-    >
-      <SelectTrigger aria-label={`Role for ${user.email}`} className="w-28 capitalize">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem
-          disabled={user.id === currentUser.id && user.role === 'admin'}
-          value="user"
-        >
-          User
-        </SelectItem>
-        <SelectItem value="admin">Admin</SelectItem>
-      </SelectContent>
-    </Select>
+    />
   )
 }
 

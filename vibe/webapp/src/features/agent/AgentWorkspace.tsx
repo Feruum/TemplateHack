@@ -3,10 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 
 import { ArcBadge, ArcEmptyState } from '@/components/arc'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription, AlertTitle } from '@/components/interface/alert'
+import { Button } from '@/components/interface/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/interface/card'
+import { Select } from '@/components/interface/select'
 import { Typography } from '@/components/typography'
 import { useAuth } from '@/features/auth'
 import { isSupportedDocument, uploadAgentDocument } from './api'
@@ -67,10 +67,18 @@ function AuthenticatedAgentWorkspace() {
           <CardHeader className="border-b">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div className="grid gap-1"><CardTitle>Chat</CardTitle><CardDescription>Pick a module or let the orchestrator choose.</CardDescription></div>
-              <Select value={selectedModuleId} onValueChange={setSelectedModuleId}>
-                <SelectTrigger aria-label="Agent module" className="w-full sm:w-56"><SelectValue placeholder="Choose a module" /></SelectTrigger>
-                <SelectContent><SelectItem value="auto">Automatic routing</SelectItem>{modules.map((module) => <SelectItem key={module.id} value={module.id}>{module.name}</SelectItem>)}</SelectContent>
-              </Select>
+              <Select
+                aria-label="Agent module"
+                className="w-full sm:w-56"
+                label="Agent module"
+                onValueChange={setSelectedModuleId}
+                options={[
+                  { value: 'auto', label: 'Automatic routing' },
+                  ...modules.map((module) => ({ value: module.id, label: module.name })),
+                ]}
+                placeholder="Choose a module"
+                value={selectedModuleId}
+              />
             </div>
             {moduleQuery.isError && <InlineError message="Could not load agent modules. Check that the agent service is running." />}
           </CardHeader>

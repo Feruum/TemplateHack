@@ -4,9 +4,9 @@ import { registerRequestSchema, type RegisterRequest } from '@web-app-demo/contr
 import { useId, useState } from 'react'
 
 import { Typography } from '@/components/typography'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/interface/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/interface/input'
 import { ApiRequestError } from '@/platform/api'
 import { useAuth } from '../use-auth'
 import { FormAlert } from './form-errors'

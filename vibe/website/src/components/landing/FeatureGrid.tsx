@@ -1,6 +1,6 @@
 import { Blocks, Layers3, Palette } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/interface/card'
 import SectionIntro from './SectionIntro'
 
 const roles = [
@@ -36,17 +36,17 @@ export default function FeatureGrid() {
     </div>
     <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {roles.map(({ icon: Icon, title, description }) => (
-        <Card key={title} className="h-full transition-all duration-200 hover:-translate-y-1 hover:ring-white/25">
-          <CardHeader>
-            <span className="mb-3 grid size-10 place-items-center rounded-xl bg-white/10 text-white">
+        <Card
+          key={title}
+          className="h-full"
+          title={title}
+          description={description}
+          leading={
+            <span className="grid size-10 place-items-center rounded-xl bg-white/10 text-white">
               <Icon className="size-5" aria-hidden="true" />
             </span>
-            <CardTitle className="text-lg font-bold">{title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="leading-6 text-muted-foreground">{description}</p>
-          </CardContent>
-        </Card>
+          }
+        />
       ))}
     </div>
   </div>

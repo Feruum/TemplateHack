@@ -156,8 +156,10 @@
 
 | Возможность | Состояние | Примечание |
 | --- | --- | --- |
-| assistant-ui and Arc Free chat UI | included | По запросу пользователя: assistant-ui 0.15.29 LocalRuntime для существующего RAG-чата, Arc Free EmptyState/Badge под MIT и Motion 14.3.0. Сохраняются защищённый SSE proxy, модули, PDF/TXT, источники и серверные tools. Cloud не подключён. См. `docs/CHAT_UI.md`. |
+| assistant-ui and Arc Free chat UI | included | assistant-ui 0.15.29 LocalRuntime owns RAG chat. Arc Free supplies the surrounding controls and states under MIT; Motion 14.3.0 is pinned. Protected SSE, modules, PDF/TXT, sources/tools and private memory remain. Cloud is not configured. See `docs/CHAT_UI.md`. |
+| Arc Free active interface | included | User requested Arc Free throughout the public site and workspace, with shadcn/ui for missing Free equivalents and assistant-ui for chats. Official copied source and adapters preserve routes, forms, data, keyboard and public no-JavaScript behavior. See `design.md` and `docs/ARC_MIGRATION.md` for exact fallbacks and source ownership. |
 | Auth (email + password) | included | Базовая возможность шаблона. |
+| Generated account avatars | included | Blobatar 2.7.0 generates local, stable account-ID faces for the profile and account menu. Uploaded photos take precedence. assistant-ui retains chat ownership and shows a decorative thinking face while waiting. See `docs/BLOBATAR.md`. |
 | Agent document Q&A | included | FastAPI/LangGraph в `services/agent`: личные PDF/TXT, Chroma, потоковые ответы с источниками и PostgreSQL checkpoints. Реальные ответы требуют chat/embedding-провайдера. |
 | Agent hybrid retrieval | included | Поиск по векторам и Unicode-ключевым словам через BM25L/RRF. Оба пути фильтруются по владельцу. При превышении лимита корпуса выполняется dense-only поиск. См. `docs/RAG_CONSOLIDATION.md`. |
 | Agent personal memory | included | Только явно сохранённые пользователем заметки; React UI, Bun proxy, PostgreSQL и проверка владельца. Модель получает инструмент только для чтения. До 100 заметок; нет автоматического копирования чатов/документов в память. |

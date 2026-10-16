@@ -6,11 +6,15 @@ Repository: [Feruum/TemplateHack](https://github.com/Feruum/TemplateHack).
 
 Interface conventions and library responsibilities are recorded in [design.md](vibe/design.md).
 
-## RAG chat interface libraries
+## Interface libraries
+
+The active site and workspace use **Arc Free** copied MIT components. Chats stay on **assistant-ui**. Missing Free equivalents use **shadcn/ui**: Sidebar/Sheet support, Field, Item, Separator, Spinner, and specialized AlertDialog. The [migration and fallback report](vibe/docs/ARC_MIGRATION.md) records what is used and why; [design.md](vibe/design.md) defines maintenance rules.
+
+The Arc migration checks passed locally on 2026-10-16: full `bun run check`, followed by **97 webapp tests**, final types/lint/builds, **18 distinct workspace browser scenarios across the full run and targeted reruns**, and **7 production-site browser cases**. Mobile focus/Escape regressions passed three repetitions at each of two widths. [Verification evidence](vibe/docs/VERIFICATION.md) records scope, repaired defects, and remaining AI configuration.
 
 The signed-in RAG chat uses **assistant-ui 0.15.29** for its runtime, composer, streaming messages, and cancellation. **Arc Free EmptyState and Badge**, with **Motion 14.3.0**, provide empty states and status badges. React/Vite, the authenticated Bun proxy, and the Python/LangGraph backend keep their existing roles. assistant-ui Cloud is not configured.
 
-Combined integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Type checks and production builds passed. Private agent caches clear on sign-out and account replacement.
+Earlier RAG integration checks on 2026-10-16 passed: **91 webapp tests and 4 Chromium scenarios**, including mobile, sources/tools, uploads, explicit note save/reload/delete, cancellation, and HTTP errors. Type checks and production builds passed. Private agent caches clear on sign-out and account replacement.
 
 See [the chat UI guide](vibe/docs/CHAT_UI.md) for architecture, behavior, limits, and checks; [Arc source provenance](vibe/webapp/src/components/arc/README.md) records the MIT license and local theme/icon/Typography adaptations.
 
@@ -68,7 +72,7 @@ No external AI or email provider is configured in the current local environment.
 | Public website | React 19, Vite 8, Tailwind CSS 4, React Three Fiber / Three.js | Pre-rendered static React page and a lazy 3D scene |
 | Private workspace | React 19, Vite 8, TanStack Router / Query / Form | Account routes, server state, forms, profile/admin screens, and agent UI |
 | UI primitives | shadcn-style components, Radix / Base UI, Tailwind CSS 4 | Shared controls, layout, and theme; shared CSS is stored locally with its MIT license |
-| Chat and status UI | assistant-ui 0.15.29, Arc Free EmptyState/Badge, Motion 14.3.0, Hugeicons | Chat lifecycle, streaming, cancellation, empty states, and status badges; see [design.md](vibe/design.md) |
+| Interface and chat UI | Arc Free, shadcn/ui fallbacks, assistant-ui 0.15.29, Motion 14.3.0, Hugeicons | Arc for active controls/panels; assistant-ui for chat; see [design.md](vibe/design.md) and [fallback inventory](vibe/docs/ARC_MIGRATION.md) |
 | Browser API | Bun, Hono 4, Zod, JOSE, Drizzle ORM | Request validation, account/session handling, permissions, storage, and trusted agent proxy |
 | Relational storage | PostgreSQL 18, Drizzle migrations, SQLAlchemy, asyncpg / psycopg | Account data, document metadata, thread ownership, and conversation checkpoints |
 | AI and retrieval | FastAPI, Uvicorn, LangChain, LangGraph, Chroma, pypdf | PDF/TXT processing, owner-filtered dense/BM25L retrieval with rank fusion, private memory, orchestration, and streaming |

@@ -10,9 +10,9 @@ import {
   AlertAction,
   AlertDescription,
   AlertTitle,
-} from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+} from '@/components/interface/alert'
+import { Button } from '@/components/interface/button'
+import { Skeleton } from '@/components/interface/skeleton'
 import { useAdminDashboardQuery } from './queries'
 
 export function AdminMetrics() {

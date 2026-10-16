@@ -554,6 +554,15 @@ export default defineConfig([
     },
   },
   {
+    // Copied MIT Arc source keeps its semantic HTML and CSS-module typography.
+    // Product compositions and adapters remain subject to the normal policy.
+    files: ['src/components/arc/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'typographyPolicy/use-typography-component': 'off',
+    },
+  },
+  {
     // Stories deliberately use plain elements to demonstrate the UI primitives
     // themselves instead of depending on product-level typography composition.
     files: ['src/stories/**/*.{ts,tsx}'],

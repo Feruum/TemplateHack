@@ -29,7 +29,7 @@ LocalRuntime replaces the handwritten chat/composer state. It is the sole owner 
 
 ## Arc Free maintenance
 
-The selected components are copied source under MIT, not an Arc Pro bundle or a global UI replacement. Retain [the license and adaptation record](../webapp/src/components/arc/README.md). Scoped aliases map Arc variables to the existing light/dark theme. The global Arc foundation/reset is not imported. Hugeicons and Typography are reused. Upstream reduced-motion and outgoing-content accessibility behavior is retained.
+Arc Free now supplies the active interface around the assistant-ui chat as well as its empty states/badges. Retain [the license and adaptation record](../webapp/src/components/arc/README.md). Namespaced aliases map Arc variables to the existing light/dark theme through portals. The global reset is not imported. Hugeicons and Typography are reused. Upstream reduced-motion and outgoing-content accessibility behavior is retained. The conversation/composer and its supporting controls stay with assistant-ui as requested; [ARC_MIGRATION.md](ARC_MIGRATION.md) lists the shadcn fallbacks elsewhere.
 
 Review upstream changes before replacing source. Do not use a generator to overwrite all shared UI. Run types, lint, adapter tests, and browser checks after changing the components or updating the pinned libraries.
 

@@ -1,35 +1,15 @@
 import { useTheme } from 'next-themes'
 
-import {
-  Moon02Icon,
-  Sun01Icon,
-  ComputerIcon,
-} from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/interface/card'
 import {
   Field,
   FieldDescription,
-  FieldLabel,
 } from '@/components/ui/field'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select } from '@/components/interface/select'
 import { Typography } from '@/components/typography'
 
 const themes = ['system', 'light', 'dark'] as const
 type Theme = typeof themes[number]
-
-const themeIcons = {
-  system: ComputerIcon,
-  light: Sun01Icon,
-  dark: Moon02Icon,
-} as const
 
 export function AppearancePanel() {
   const { theme = 'system', setTheme } = useTheme()
@@ -47,25 +27,19 @@ export function AppearancePanel() {
       </CardHeader>
       <CardContent>
         <Field>
-          <FieldLabel htmlFor="appearance-theme">Theme</FieldLabel>
           <Select
+            className="w-full sm:w-52"
+            id="appearance-theme"
+            label="Theme"
             onValueChange={(value) => {
               if (isTheme(value)) setTheme(value)
             }}
+            options={themes.map((item) => ({
+              value: item,
+              label: item[0].toUpperCase() + item.slice(1),
+            }))}
             value={selectedTheme}
-          >
-            <SelectTrigger className="w-full sm:w-52" id="appearance-theme">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {themes.map((item) => (
-                <SelectItem className="capitalize" key={item} value={item}>
-                  <HugeiconsIcon aria-hidden icon={themeIcons[item]} strokeWidth={2} />
-                  {item}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
           <FieldDescription>
             Changes are saved in this browser and applied immediately.
           </FieldDescription>

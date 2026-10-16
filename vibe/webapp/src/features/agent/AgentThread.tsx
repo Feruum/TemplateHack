@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Typography } from '@/components/typography'
+import { BlobAvatar } from '@/components/identity/BlobAvatar'
 import type { AuthenticatedTransport } from '@/platform/api'
 import { createAgentModelAdapter, type RagMetadata } from './runtime'
 
@@ -68,7 +69,10 @@ function ChatMessage() {
       <Typography variant="caption" tone="muted">{human ? 'You' : 'Agent'}</Typography>
       <div className={`min-w-0 rounded-lg px-4 py-3 ${human ? 'bg-secondary' : 'bg-muted/60'}`}>
         <MessagePrimitive.Content components={{ Text: PlainText }} />
-        {waiting && <Typography tone="muted" variant="bodySm">Thinking…</Typography>}
+        {waiting && <div className="flex items-center gap-2" data-testid="agent-thinking">
+          <span className="size-8 shrink-0"><BlobAvatar seed="templatehack:assistant" thinking /></span>
+          <Typography tone="muted" variant="bodySm">Thinking…</Typography>
+        </div>}
         {(rag?.tools.length ?? 0) > 0 && <div className="mt-3 flex flex-wrap gap-2" data-testid="agent-tools">
           {rag!.tools.map((tool) => <div key={tool.id} className="grid gap-1">
             <ArcBadge tone={tool.status === 'error' ? 'danger' : tool.status === 'ok' ? 'success' : 'warning'} size="sm">{`${tool.name}: ${tool.status}`}</ArcBadge>

@@ -8,14 +8,14 @@ import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/interface/button'
+import { Card, CardContent } from '@/components/interface/card'
 import {
   Empty,
   EmptyContent,
   EmptyHeader,
   EmptyMedia,
-} from '@/components/ui/empty'
+} from '@/components/interface/empty'
 import { Spinner } from '@/components/ui/spinner'
 import { Typography } from '@/components/typography'
 

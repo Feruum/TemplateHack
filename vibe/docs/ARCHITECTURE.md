@@ -6,6 +6,12 @@ The active project mode is local development. React/Vite serves the pre-rendered
 
 The `/app/assistant` feature composes assistant-ui LocalRuntime/primitives through `AgentThread.tsx`. Its feature-local `runtime.ts` adapter uses the existing authenticated transport and SSE contracts; it does not create another API client, execute browser tools, or use assistant-ui Cloud. TanStack Query retains document/module ownership. Selected Arc Free EmptyState/Badge source lives in `webapp/src/components/arc/`, with scoped aliases to existing theme tokens and its MIT license. See [CHAT_UI.md](CHAT_UI.md) for boundaries, behavior, and maintenance.
 
+## Interface ownership
+
+Both browser applications use copied MIT Arc Free source under `src/components/arc/`, composed through `src/components/interface/`. These layers own presentation only. Features retain form validation, transport, state, permissions, and navigation. Namespaced foundation tokens map to the existing theme without a global reset. assistant-ui owns chat; the existing shadcn Sidebar, structural compounds, and specialized AlertDialog remain documented fallbacks. See [ARC_MIGRATION.md](ARC_MIGRATION.md) and [design.md](../design.md).
+
+The public site's native menu/FAQ enhance to Arc only after hydration. Full pre-rendered HTML, real anchors, no-JavaScript operation, and the optional 3D fallback remain website responsibilities.
+
 ## Components
 
 | Component | Responsibility | Local address |

@@ -2,40 +2,29 @@ import { expect, test } from 'bun:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-import { Empty } from '../src/components/ui/empty'
-import { SessionLoadingSection } from '../src/components/WebRouteSections'
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from '../src/components/interface/empty'
+import { SessionErrorSection, SessionLoadingSection } from '../src/components/WebRouteSections'
 
-function emptySlot(markup: string) {
-  const tag = markup.match(/<div[^>]*data-slot="empty"[^>]*>/)?.[0]
-  if (!tag) throw new Error('no data-slot="empty" element rendered')
-  const classes = tag.match(/class="([^"]*)"/)?.[1]?.split(/\s+/) ?? []
-  return { classes, tag }
-}
-
-test('Empty keeps its standalone padding by default', () => {
-  const { classes, tag } = emptySlot(renderToStaticMarkup(createElement(Empty)))
-
-  expect(tag).toContain('data-size="default"')
-  expect(classes).toContain('p-12')
+test('the Arc empty-state composition retains its title, description, and action', () => {
+  const html = renderToStaticMarkup(createElement(Empty, null,
+    createElement(EmptyHeader, null, createElement(EmptyTitle, null, 'No matching users'), createElement(EmptyDescription, null, 'Change the search query.')),
+    createElement(EmptyContent, null, createElement('button', { type: 'button' }, 'Clear search')),
+  ))
+  expect(html).toContain('No matching users')
+  expect(html).toContain('Change the search query.')
+  expect(html).toContain('Clear search')
 })
 
-test('Empty size="sm" is the nested variant with its own reduced padding', () => {
-  const { classes, tag } = emptySlot(
-    renderToStaticMarkup(createElement(Empty, { size: 'sm' })),
-  )
-
-  expect(tag).toContain('data-size="sm"')
-  expect(classes).toContain('p-4')
-  expect(classes).toContain('sm:p-8')
-  expect(classes).not.toContain('p-12')
+test('session loading preserves the page heading and explanation through the Arc adapter', () => {
+  const html = renderToStaticMarkup(createElement(SessionLoadingSection))
+  expect(html).toMatch(/<h1\b[^>]*>Loading workspace<\/h1>/)
+  expect(html).toContain('Checking session...')
 })
 
-test('route state cards compose Empty through its size prop, not class overrides', () => {
-  const { classes, tag } = emptySlot(
-    renderToStaticMarkup(createElement(SessionLoadingSection)),
-  )
-
-  expect(tag).toContain('data-size="sm"')
-  expect(classes).not.toContain('border-0')
-  expect(classes).not.toContain('p-12')
+test('session recovery remains announced and exposes its retry control', () => {
+  const html = renderToStaticMarkup(createElement(SessionErrorSection, { retry: async () => {} }))
+  expect(html).toContain('role="alert"')
+  expect(html).toContain('aria-live="assertive"')
+  expect(html).toContain('Your session was not cleared.')
+  expect(html).toContain('Try again')
 })

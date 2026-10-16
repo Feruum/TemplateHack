@@ -1,6 +1,6 @@
 # Public React website
 
-The public site uses React 19, Vite 8, Tailwind CSS 4, and the existing shadcn/Radix/Base UI components. Astro has been removed at the user's request. The signed-in workspace remains a separate React/Vite application in `webapp/`.
+The public site uses React 19, Vite 8, Tailwind CSS 4, and official copied MIT **Arc Free** Button/ButtonLink, Card, Badge, Accordion, and DropdownMenu. Motion 14.3.0 supplies their animations. The existing shadcn/Radix Separator is the standalone fallback. Keep [source provenance and MIT notices](src/components/arc/PROVENANCE.md). Astro has been removed. The signed-in workspace remains a separate React/Vite application in `webapp/`.
 
 ## Rendering and behavior
 
@@ -8,7 +8,7 @@ The single landing page is composed by `src/App.tsx` and React sections under `s
 
 `scripts/build.mjs` uses Vite's SSR build API and React DOM `renderToString` to generate complete static HTML. A client build then supplies hashed assets. Temporary server-rendering output is removed after the build. The published output is `website/dist`, including pre-rendered `index.html` and immutable `assets/`; it needs no production Node server.
 
-The development Vite middleware renders the same application and metadata into HTML. The client entry hydrates it when the browser is idle, with a 2500 ms deadline. Header and FAQ disclosures use native HTML and work before hydration.
+The development Vite middleware renders the same application and metadata into HTML. The client entry hydrates it when the browser is idle, with a 2500 ms deadline. Header and FAQ disclosures use native HTML before hydration or without JavaScript. Their `components/interface/` adapters enhance to Arc afterward, preserving open state, focus, real anchors, and multiple open FAQ answers. Tokens are namespaced and mapped to the existing site theme without importing a global reset. See [design.md](../design.md) and the [fallback report](../docs/ARC_MIGRATION.md).
 
 `HeroScene` keeps its complete static visual fallback. Its Three.js canvas is dynamically loaded only for desktop viewports that permit motion and provide a WebGL2 context. Mobile, reduced-motion, and WebGL-disabled browsers retain the fallback; loading errors do not remove it.
 
@@ -40,6 +40,8 @@ Title, description, Russian language, dark theme, favicon, Open Graph, and Twitt
 ## Checks and architecture
 
 The existing website tests cover public-link configuration, hero eligibility/loading, and Storybook inventory. Metadata tests cover escaping and URL validation. Build-contract checks verify pre-rendered content, hashed assets, lazy canvas separation, and exclusion of story-only CSS.
+
+Arc migration verification on 2026-10-16 passed 7 production Chromium cases: 1440px, 390px, and 700px with JavaScript enabled/disabled, plus a WebGL-disabled desktop fallback. Navigation anchors, multiple FAQ panels, keyboard operation, reduced motion, absence of page/hydration errors, and screenshot review were checked. See [VERIFICATION.md](../docs/VERIFICATION.md).
 
 Keep account routes, permissions, checkout, and private data in `webapp/` and `backend/`. This migration does not add payments, public API data, or runtime server rendering. See [WEB_SURFACES.md](../docs/WEB_SURFACES.md) and [ARCHITECTURE.md](../docs/ARCHITECTURE.md).
 

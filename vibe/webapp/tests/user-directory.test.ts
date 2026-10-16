@@ -4,14 +4,6 @@ import { afterEach, expect, test } from 'bun:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../src/components/ui/table'
 import { adminUsersQueryOptions } from '../src/features/admin/queries'
 import { UserDirectory } from '../src/features/admin/UserDirectory'
 import { AuthContext, type AuthContextValue } from '../src/features/auth/context'
@@ -55,8 +47,6 @@ test('below the table breakpoint each user is a list item whose fields carry vis
   users.forEach((user, index) => {
     const item = items[index] ?? ''
 
-    // The row surface comes from the Item primitive's own variant, not from classes on the <li>.
-    expect(item).toMatch(/^[^>]*data-slot="item"[^>]*data-variant="outline"/)
     expect(fieldLabels(item)).toEqual(['User', 'Role', 'Created'])
     expect(fieldValue(item, 'User')).toContain(user.email)
     expect(fieldValue(item, 'Role')).toContain(`aria-label="Role for ${user.email}"`)
@@ -65,30 +55,18 @@ test('below the table breakpoint each user is a list item whose fields carry vis
   expect(fieldValue(items[0] ?? '', 'User')).toContain('Ada Admin')
 })
 
-test('from the table breakpoint up the directory is a real table built from unmodified primitives', () => {
+test('from the table breakpoint up the directory preserves native table headings and labeled role controls', () => {
   const html = renderDirectory({ fitsTable: true })
 
   expect(html).not.toContain('role="list"')
+  expect(html).toMatch(/<table\b/)
   expect(headerCells(html)).toEqual(['User', 'Role', 'Created'])
   for (const user of users) {
     expect(html).toContain(`aria-label="Role for ${user.email}"`)
   }
 
-  const pristine = renderToStaticMarkup(
-    createElement(
-      Table,
-      null,
-      createElement(TableHeader, null, createElement(TableRow, null, createElement(TableHead))),
-      createElement(TableBody, null, createElement(TableRow, null, createElement(TableCell))),
-    ),
-  )
-  for (const slot of ['table', 'table-header', 'table-body', 'table-row', 'table-head', 'table-cell']) {
-    const ownClasses = slotClasses(pristine, slot)[0]
-    const rendered = slotClasses(html, slot)
-
-    expect(rendered.length).toBeGreaterThan(0)
-    for (const classes of rendered) expect(classes).toBe(ownClasses)
-  }
+  expect(html).toContain('scope="col"')
+  expect(html).toContain('Mar 5, 2026')
 })
 
 // The directory renders host elements and picks its layout from `matchMedia` during the first
@@ -148,11 +126,5 @@ function fieldValue(item: string, label: string) {
 }
 
 function headerCells(html: string) {
-  return [...html.matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map((match) => match[1])
-}
-
-function slotClasses(html: string, slot: string) {
-  return [...html.matchAll(new RegExp(`<\\w+[^>]*data-slot="${slot}"[^>]*>`, 'g'))].map(
-    (match) => match[0].match(/class="([^"]*)"/)?.[1] ?? '',
-  )
+  return [...html.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map((match) => match[1]?.replace(/<[^>]*>/g, ''))
 }

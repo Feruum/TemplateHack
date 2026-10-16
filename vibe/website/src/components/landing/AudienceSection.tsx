@@ -1,6 +1,6 @@
 import { BriefcaseBusiness, Rocket, Workflow } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/interface/card'
 import SectionIntro from './SectionIntro'
 
 const audiences = [
@@ -43,22 +43,26 @@ export default function AudienceSection() {
 
     <div className="mt-12 grid gap-5 lg:grid-cols-3">
       {audiences.map(({ icon: Icon, number, title, description, note }) => (
-        <Card key={title} className="h-full bg-card py-0">
-          <CardHeader className="flex min-h-24 flex-row items-center justify-between border-b bg-gradient-to-br from-white/8 via-transparent to-transparent p-6">
+        <Card
+          key={title}
+          className="h-full"
+          title={title}
+          description={description}
+          contentLayout="column"
+          header={
             <span className="grid size-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15">
               <Icon className="size-5" aria-hidden="true" />
             </span>
+          }
+          headerAction={
             <span className="rounded-full border border-white/15 px-3 py-1.5 font-heading text-xs font-bold tracking-widest text-white/70 tabular-nums">
               {number}
             </span>
-          </CardHeader>
-          <CardContent className="flex h-full flex-col p-6">
-            <CardTitle className="text-xl font-bold">{title}</CardTitle>
-            <p className="mt-3 flex-1 leading-6 text-muted-foreground">{description}</p>
+          }
+        >
             <p className="mt-8 border-t pt-4 text-xs font-bold tracking-wide text-white/55 uppercase">
               {note}
             </p>
-          </CardContent>
         </Card>
       ))}
     </div>
